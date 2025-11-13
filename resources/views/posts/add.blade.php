@@ -5,7 +5,7 @@
 </div>
 
 <div class="col-8 mx-auto">
-    <form action="{{ url('posts') }}" method="post" class="form border p-3">
+    <form action="{{ url('posts') }}" method="post" class="form border p-3" enctype="multipart/form-data">
         @csrf
 
         @include('layout.error')
@@ -24,9 +24,22 @@
         <div class="mb-3">
             <label for="">Writer</label>
             <select name="user_id" class="form-control">
-                <option value="1">saif</option>
-                <option value="2">yasser</option>
+             @foreach ($users as $user)
+                <option value="{{ $user->id }}">{{ $user->name }}</option>
+             @endforeach
             </select>
+        </div>
+        <div class="mb-3">
+            <label for="">Tags</label>
+            <select name="tags[]" class="form-control" multiple>
+             @foreach ($tags as $tag)
+                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+             @endforeach
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for=""> Post Image</label>
+            <input type="file" class="form-control" name="image" >
         </div>
 
         <div class="mb-3">

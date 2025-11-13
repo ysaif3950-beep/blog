@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post; // <-- ده الموديل
+use App\Models\Tag;
 use App\Http\Requests\StorePostRequest; // الريكويست
 use App\Http\Requests\UpdatePostRequest;
+use App\Models\User;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -32,25 +34,27 @@ class PostController extends Controller
 
     public function index()
     {
-         $posts = Post::paginate(15);
+         $posts = Post::orderby('id','desc')->paginate(15);
         return view('posts.index',['posts'=>$posts]);
     }
      public function home()
     {
-        $posts= Post::paginate(15);
+        $posts= Post::orderby('id','desc')->paginate(15);
         return view('home',['posts'=>$posts]);
     }
 
     public function create()
     {
-        return view('posts.add');
+        $users=User::select('id','name')->get();
+        $tags=Tag::select('id','name')->get();
+        return view('posts.add',compact('users','tags') );
     }
 
     public function edit($id)
     {
         $post=Post::findorfail($id);
-
-        return view('posts.edit',['post'=>$post]);
+        $tags=Tag::select('id','name')->get();
+        return view('posts.edit',['post'=>$post,'tags'=>$tags]);
 
     }
 
@@ -64,14 +68,29 @@ class PostController extends Controller
     }
 
 
-
-    public function store(StorePostRequest $request)
+public function store(StorePostRequest $request)
     {
-        // بدل الـ dd، تقدر تعمل تخزين للموديل
-        Post::create($request->validated());
-        return redirect('posts')->with('success', 'Post created successfully');
+        // التحقق من البيانات القادمة من الفورم
+        $data = $request->validated();
 
+        // لو فيه صورة مرفوعة
+        if ($request->hasFile('image')) {
+            // تخزين الصورة داخل فولدر images داخل storage/app/public
+          $path = $request->file('image')->store('uploads', 'public');
+
+
+            // حفظ المسار داخل قاعدة البيانات
+            $data['image'] = $path;
+        }
+
+        // إنشاء البوست
+        $post = Post::create($data);
+        $post->tags()->sync($request->input('tags', []));
+
+        // إعادة التوجيه بعد النجاح
+        return redirect()->route('posts.index')->with('success', 'تم إنشاء البوست بنجاح ✅');
     }
+
     public function destroy($id)
     {
 

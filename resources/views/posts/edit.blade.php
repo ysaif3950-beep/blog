@@ -30,7 +30,18 @@
                 <option value="2">yasser</option>
             </select>
         </div>
-
+        <div class="mb-3">
+            <label for="">Tags</label>
+            <select name="tags[]" class="form-control" multiple>
+             @foreach ($tags as $tag)
+                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+             @endforeach
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for=""> Post Image</label>
+            <input type="file" class="form-control" name="image" >
+        </div>
         <div class="mb-3">
             <input type="submit" class="form-control bg-success text-white" value="Save">
         </div>

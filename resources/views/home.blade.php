@@ -13,6 +13,7 @@
 </div>
   <div class="card-body">
     <h5 class="card-title">{{$post->title}}</h5>
+        <img src="{{ $post->image_url }}" alt="{{ $post->title }}" width="100" class="img-thumbnail mb-3">
     <p class="card-text">{{ \Str::limit($post->description,50)}}</p>
     <a href="{{url('posts/' .$post->id)}}" class="btn btn-primary">Show post</a>
   </div>
