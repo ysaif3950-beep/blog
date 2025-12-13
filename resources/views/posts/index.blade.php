@@ -1,7 +1,9 @@
 @extends('layout.app')
 @section('content')
     <div class="col-12">
+        @can('create-post')
         <a href="{{url('posts/create')}}" class="btn btn-primary my-3">Add New Post</a>
+        @endcan
         <h1 class="p-3 border text-center my-3">All posts</h1>
     </div>
 
@@ -27,12 +29,12 @@
                     <td>{{$post->title}}</td>
                     <td>{{$post->description}}</td>
                     <td>{{ $post->user->name ?? 'No user' }}</td>
-                    <td> 
+                    <td>
                     @forelse ($post->tags as $tag)
               <span class="badge bg-primary me-1">{{ $tag->name }}</span>
-  
-  
-                 @empty              
+
+
+                 @empty
                     <span class="text-muted">No tags</span>
                 @endforelse
                     </td>
@@ -41,7 +43,9 @@
                         <img src="{{ $post->image_url }}" alt="{{ $post->title }}" width="100" class="img-thumbnail">
                     </td>
                     <td>
+                    @can('update-post',$post)
                         <a href="{{url('posts/' .$post->id. '/edit')}}" class="btn btn-info btn-sm">Edit</a>
+                    @endcan
                     </td>
                     <td>
                         <form action="{{url('posts/'.$post->id)}}" method="post" class="d-inline">

@@ -1,7 +1,11 @@
 @extends('layout.app')
 @section('content')
     <div class="col-12">
+          @can('create,/App/models/tag::class')
+
         <a href="{{ url('tags/create') }}" class="btn btn-primary my-3">Add New Tag</a>
+        @endcan
+
         <h1 class="p-3 border text-center my-3">All tags</h1>
     </div>
 
@@ -26,20 +30,25 @@
                           <td>
                             @forelse ($tag->posts as $post)
                             <span class="badge bg-primary me-1">{{ $post->title }}</span>
-  
-  
-                 @empty              
+
+
+                 @empty
                     <span class="text-muted">No posts</span>
                 @endforelse
                           </td>
 
                         <td>
+                            @can('update' ,$tag)
+
                             <a href="{{ url('tags/' . $tag->id . '/edit') }}" class="btn btn-info btn-sm">Edit</a>
+                            @endcan
+
                         </td>
                         <td>
                             <form action="{{ url('tags/' . $tag->id) }}" method="post" class="d-inline">
                                 @method('DELETE')
                                 @csrf
+                                
                                 <input type="submit" value="Delete" class="btn btn-danger btn-sm"
                                     onclick="return confirm('Are you sure you want to delete this tag?')">
                             </form>

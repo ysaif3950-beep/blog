@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\tag;
+use Illuminate\Support\Facades\Gate;
 class TagController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    public function __construct()
+    {
+        $this->middleware('can:admin-control');
+    }
     public function index()
     {
         //

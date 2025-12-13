@@ -9,7 +9,7 @@
 
 
 <div class="col-8 mx-auto">
-    <form action="{{ url('posts/'.$post->id) }}" method="post" class="form border p-3">
+    <form action="{{ url('posts/'.$post->id) }}" method="post" class="form border p-3" enctype="multipart/form-data">
         @csrf
         @method('put')
         <div class="mb-3">
@@ -23,18 +23,13 @@
             <textarea class="form-control" name="description"  rows="7">{{$post->description}}</textarea>
         </div>
 
-        <div class="mb-3">
-            <label for="">Writer</label>
-            <select name="user_id" class="form-control">
-                <option value="1">saif</option>
-                <option value="2">yasser</option>
-            </select>
-        </div>
+        <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+       
         <div class="mb-3">
             <label for="">Tags</label>
             <select name="tags[]" class="form-control" multiple>
              @foreach ($tags as $tag)
-                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                <option @selected($post->tags->contains($tag->id)) value="{{ $tag->id }}">{{ $tag->name }}</option>
              @endforeach
             </select>
         </div>

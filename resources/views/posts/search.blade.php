@@ -4,19 +4,22 @@
 <div class="col-12">
     <h2>نتائج البحث</h2>
 
-    @if($posts->count() > 0)
-        @foreach($posts as $post)
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5>{{ $post->title }}</h5>
-                    <p>{{ $post->description }}</p>
-                    <a href="{{url('posts/' .$post->id)}}" class="btn btn-primary">Show post</a>
-                </div>
-            </div>
-        @endforeach
-    @else
-        <p>لا توجد نتائج للبحث</p>
-    @endif
+    @foreach ($posts as $post)
+
+<div class="col-12"></div>
+
+     <div class="card">
+                    <div class="card-header">
+    {{$post->user->name}} -{{$post->created_at->format('Y-m-d')}}
+</div>
+  <div class="card-body">
+    <h5 class="card-title">{{$post->title}}</h5>
+        <img src="{{ $post->image_url }}" alt="{{ $post->title }}" width="100" class="img-thumbnail mb-3">
+    <p class="card-text">{{ \Str::limit($post->description,50)}}</p>
+    <a href="{{url('posts/' .$post->id)}}" class="btn btn-primary">Show post</a>
+  </div>
+           </div>
+  @endforeach
 
 </div>
 @endsection

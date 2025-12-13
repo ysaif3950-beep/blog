@@ -21,14 +21,8 @@
             <textarea class="form-control" name="description" rows="7">{{ old('description')}}</textarea>
         </div>
 
-        <div class="mb-3">
-            <label for="">Writer</label>
-            <select name="user_id" class="form-control">
-             @foreach ($users as $user)
-                <option value="{{ $user->id }}">{{ $user->name }}</option>
-             @endforeach
-            </select>
-        </div>
+        {{-- المستخدم الحالي محدد تلقائياً --}}
+        <input type="hidden" name="user_id" value="{{ auth()->id() }}">
         <div class="mb-3">
             <label for="">Tags</label>
             <select name="tags[]" class="form-control" multiple>

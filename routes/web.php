@@ -4,11 +4,15 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 //Route::get('/', function () {
    // return view('home');
 //});
-Route::get('/',[PostController::class,'home']);
+Route::middleware('auth')->group(function () {
+
+Route::get('/', [PostController::class, 'home'])->name('dashboard');
+Route::get('posts/search', [PostController::class, 'search']);
 /*
 Route::get('posts',[PostController::class,'index']);
 Route::get('posts/create',[PostController::class,'create']);
@@ -19,10 +23,14 @@ Route::post('posts',[PostController::class,'store']);
 Route::delete('posts/{id}',[PostController::class,'destroy']);
 Route::put('posts/{id}',[PostController::class,'update']);
 */
-Route::resource('posts',PostController::class);
+Route::resource('posts', PostController::class);
 
-Route::resource('users',UserController::class);
+Route::resource('users', UserController::class)->middleware('can:admin-control');
 Route::get('users/{id}/posts', [UserController::class, 'posts'])->name('users.posts');
-Route::resource('tags',TagController::class);
+Route::resource('tags', TagController::class);
+});
 
 
+Auth::routes();
+
+Route::get('/home', [PostController::class, 'home'])->name('home');
