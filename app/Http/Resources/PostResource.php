@@ -27,7 +27,7 @@ class PostResource extends JsonResource
 
               'image'=>$this->image_url,
               'user'=>new UserResource($this->whenloaded('user')),
-              'tag'=>TagResourse::collection($this->whenLoaded('tags')),
+              'tag'=>TagResource::collection($this->whenLoaded('tags')),
               'created_at'=>$this->created_at->format('Y/m/d'),
               'updated_at'=>$this->updated_at->format('Y/m/d'),
 

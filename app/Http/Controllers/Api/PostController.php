@@ -1,79 +1,76 @@
 <?php
 
-namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Auth;
+namespace App\Http\Controllers\Api;
 use App\Models\Post; // <-- ده الموديل
 use App\Models\Tag;
 use App\Http\Requests\StorePostRequest; // الريكويست
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
-use App\Http\Resources\TagResourse;
+use App\Http\Resources\TagResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Auth\Events\Validated;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\TagResourse;
+
 class PostController extends Controller
 {
-     public function show($id)
+    //
+    public function show($id)
     {
-        $post= Post::findorfail($id);
+        $post= Post::with(['user','tags'])->findOrFail($id);
 
-        return view('posts.show',['post'=>$post]);
+        return new PostResource($post);
+
     }
-
-
-
     public function search(Request $request)
-    {
-       $posts= Post::where
-         ('description','like','%'.$request->search.'%')->
-         orwhere('title','like','%'.$request->search.'%')->paginate(15);
-        return view('posts.search',['posts'=>$posts]);
-    }
+{
+    $posts = Post::with(['user', 'tags'])
+        ->where(function ($q) use ($request) {
+            $q->where('title', 'like', "%{$request->search}%")
+              ->orWhere('description', 'like', "%{$request->search}%");
+        })
+        ->paginate(15);
 
+    return PostResource::collection($posts)->additional([
+        'status' => 'success',
+        'total'  => $posts->total(),
+    ]);
+}
 
-
-
-
-    public function index()
+     public function index()
     {
          $posts = Post::orderby('id','desc')->paginate(15);
-        return view('posts.index',['posts'=>$posts]);
+        return PostResource::collection($posts);
     }
-
-
-
-     public function home()
+public function home()
     {
         $posts= Post::orderby('id','desc')->paginate(15);
-        return view('home',['posts'=>$posts]);
+        return PostResource::collection($posts);
+
     }
-
-
-
-    public function create()
+  public function create()
     {
-        Gate::authorize('create-post');
         $tags=Tag::select('id','name')->get();
-        return view('posts.add',compact('tags') );
+        return TagResource::collection($tags);
+
     }
-
-
-    public function edit($id)
+public function edit($id)
     {
         $post=Post::findorfail($id);
         $tags=Tag::select('id','name')->get();
         $users=User::select('id','name')->get();
-        return view('posts.edit',['post'=>$post,'tags'=>$tags,'users'=>$users ]);
+        return response()->json([
 
+            'post'=> new PostResource($post),
+            'users'=>UserResource::collection($users),
+            'tags'=>TagResource::collection($tags),
+
+        ],200);
     }
-   
-
-
-     public function update($id ,UpdatePostRequest $request)
+     public function update(UpdatePostRequest $request,$id)
     {
         $post=Post::findorfail($id);
         $old_image=$post->image;
@@ -98,17 +95,16 @@ class PostController extends Controller
         // تحديث البوست
         $post->update($data);
         $post->tags()->sync($request->input('tags', []));
+           return response()->json([
 
-        return redirect('posts')->with('success', 'Post updated successfully');
-       // return view('posts.edit',['post'=>$post]);
+                'post'=>new PostResource($post),
+                'user'=>new UserResource($post->user),
+                'tags' => TagResource::collection($post->tags),
+           ], 200);
     }
 
-
-
-
-public function store(StorePostRequest $request)
+    public function store(StorePostRequest $request)
     {
-        Gate::authorize('create-post');
         // التحقق من البيانات القادمة من الفورم
         $data = $request->validated();
 
@@ -130,17 +126,22 @@ public function store(StorePostRequest $request)
         $post->tags()->sync($request->input('tags', []));
 
         // إعادة التوجيه بعد النجاح
-        return redirect()->route('posts.index')->with('success', 'تم إنشاء البوست بنجاح ✅');
+        return response()->json([
+
+                'post'=>new PostResource($post),
+                'user'=>new UserResource($post->user),
+                'tags' => TagResource::collection($post->tags),
+           ], 200 );
     }
 
-
-
-    public function destroy($id)
+     public function destroy($id)
     {
 
         $post=Post::findorfail($id);
         $post->delete();
-        return redirect()->back()->with('success', 'Post deleted successfully!');
+       return response()->json([
+        'message' => 'Post deleted successfully '
+    ], 200);
     }
 
 }
