@@ -4,24 +4,22 @@ namespace App\Http\Controllers\Api;
 use App\Models\tag;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TagResource;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class TagController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Display a listing of the resource.
      */
-   public function index()
+    public function index()
     {
-        //
-
-        $tags=tag::paginate(15);
-        return TagResource::collection($tags)->additional(
-            [
-                'status'=>'success',
-                'total'=>$tags->total(),
-                'current_page'=>$tags->currentpage()
-            ]
+        $tags = tag::paginate(15);
+        return $this->paginated(
+            TagResource::collection($tags),
+            'Tags retrieved successfully'
         );
     }
 
@@ -30,15 +28,16 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        //
-         $data = $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|min:3|max:100',
         ]);
-       $tag= tag::create($data);
-        return response()->json([
-            'status'=>'success',
-            'data'=>new TagResource($tag),
-        ],201);
+
+        $tag = tag::create($data);
+        
+        return $this->created(
+            new TagResource($tag),
+            'Tag created successfully'
+        );
     }
 
     /**
@@ -46,11 +45,10 @@ class TagController extends Controller
      */
     public function show(tag $tag)
     {
-        //
-         return response()->json([
-            'status'=>'success',
-            'data'=>new TagResource($tag),
-        ],200);
+        return $this->successWithResource(
+            new TagResource($tag),
+            'Tag retrieved successfully'
+        );
     }
 
     /**
@@ -58,29 +56,27 @@ class TagController extends Controller
      */
     public function update(Request $request, tag $tag)
     {
-        //
-         $data = $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|min:3|max:100',
         ]);
+
         $tag->update($data);
 
-         return response()->json([
-            'status'=>'success',
-            'data'=>new TagResource($tag),
-        ],200);
+        return $this->updated(
+            new TagResource($tag),
+            'Tag updated successfully'
+        );
     }
 
     /**
      * Remove the specified resource from storage.
      */
-   public function destroy(tag $tag)
+    public function destroy(tag $tag)
     {
-        //
         $tag->posts()->detach();
         $tag->delete();
-        return response()->json([
-            'status'=>'success',
-             'message' => 'Tag deleted successfully'
-        ], 200, );
+        
+        return $this->deleted('Tag deleted successfully');
     }
 }
+

@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-use App\Models\Post; // <-- ده الموديل
+use App\Models\Post;
 use App\Models\Tag;
-use App\Http\Requests\StorePostRequest; // الريكويست
+use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\TagResource;
@@ -11,137 +11,160 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
-
 use App\Http\Controllers\Controller;
-use App\Http\Resources\TagResourse;
+use App\Traits\ApiResponse;
 
 class PostController extends Controller
 {
-    //
+    use ApiResponse;
+
+    /**
+     * Display a listing of posts.
+     */
+    public function index()
+    {
+        $posts = Post::orderBy('id', 'desc')->paginate(15);
+        return $this->paginated(
+            PostResource::collection($posts),
+            'Posts retrieved successfully'
+        );
+    }
+
+    /**
+     * Home page posts listing.
+     */
+    public function home()
+    {
+        $posts = Post::orderBy('id', 'desc')->paginate(15);
+        return $this->paginated(
+            PostResource::collection($posts),
+            'Posts retrieved successfully'
+        );
+    }
+
+    /**
+     * Display the specified post.
+     */
     public function show($id)
     {
-        $post= Post::with(['user','tags'])->findOrFail($id);
-
-        return new PostResource($post);
-
+        $post = Post::with(['user', 'tags'])->findOrFail($id);
+        return $this->successWithResource(
+            new PostResource($post),
+            'Post retrieved successfully'
+        );
     }
+
+    /**
+     * Search for posts.
+     */
     public function search(Request $request)
-{
-    $posts = Post::with(['user', 'tags'])
-        ->where(function ($q) use ($request) {
-            $q->where('title', 'like', "%{$request->search}%")
-              ->orWhere('description', 'like', "%{$request->search}%");
-        })
-        ->paginate(15);
-
-    return PostResource::collection($posts)->additional([
-        'status' => 'success',
-        'total'  => $posts->total(),
-    ]);
-}
-
-     public function index()
     {
-         $posts = Post::orderby('id','desc')->paginate(15);
-        return PostResource::collection($posts);
+        $posts = Post::with(['user', 'tags'])
+            ->where(function ($q) use ($request) {
+                $q->where('title', 'like', "%{$request->search}%")
+                  ->orWhere('description', 'like', "%{$request->search}%");
+            })
+            ->paginate(15);
+
+        return $this->paginated(
+            PostResource::collection($posts),
+            'Search results retrieved successfully'
+        );
     }
-public function home()
-    {
-        $posts= Post::orderby('id','desc')->paginate(15);
-        return PostResource::collection($posts);
 
+    /**
+     * Get data for creating a new post.
+     */
+    public function create()
+    {
+        $tags = Tag::select('id', 'name')->get();
+        return $this->success(
+            TagResource::collection($tags),
+            'Tags for post creation retrieved successfully'
+        );
     }
-  public function create()
-    {
-        $tags=Tag::select('id','name')->get();
-        return TagResource::collection($tags);
 
+    /**
+     * Get data for editing a post.
+     */
+    public function edit($id)
+    {
+        $post = Post::findOrFail($id);
+        $tags = Tag::select('id', 'name')->get();
+        $users = User::select('id', 'name')->get();
+
+        return $this->success([
+            'post' => new PostResource($post),
+            'users' => UserResource::collection($users),
+            'tags' => TagResource::collection($tags),
+        ], 'Post edit data retrieved successfully');
     }
-public function edit($id)
+
+    /**
+     * Store a newly created post.
+     */
+    public function store(StorePostRequest $request)
     {
-        $post=Post::findorfail($id);
-        $tags=Tag::select('id','name')->get();
-        $users=User::select('id','name')->get();
-        return response()->json([
+        $data = $request->validated();
+        $data['user_id'] = auth()->id();
 
-            'post'=> new PostResource($post),
-            'users'=>UserResource::collection($users),
-            'tags'=>TagResource::collection($tags),
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('uploads', 'public');
+            $data['image'] = $path;
+        }
 
-        ],200);
+        $post = Post::create($data);
+        $post->tags()->sync($request->input('tags', []));
+
+        // Load relationships
+        $post->load(['user', 'tags']);
+
+        return $this->created(
+            new PostResource($post),
+            'Post created successfully'
+        );
     }
-     public function update(UpdatePostRequest $request,$id)
-    {
-        $post=Post::findorfail($id);
-        $old_image=$post->image;
 
-        // التحقق من البيانات القادمة من الفورم
+    /**
+     * Update the specified post.
+     */
+    public function update(UpdatePostRequest $request, $id)
+    {
+        $post = Post::findOrFail($id);
+        $old_image = $post->image;
         $data = $request->validated();
 
-        // لو فيه صورة جديدة مرفوعة
         if ($request->hasFile('image')) {
-            // رفع الصورة الجديدة أولاً
             $path = $request->file('image')->store('uploads', 'public');
 
-            // لو فيه صورة قديمة، امسحها بعد رفع الجديدة بنجاح
             if ($old_image && Storage::disk('public')->exists($old_image)) {
                 Storage::disk('public')->delete($old_image);
             }
 
-            // حفظ المسار الجديد داخل قاعدة البيانات
             $data['image'] = $path;
         }
 
-        // تحديث البوست
         $post->update($data);
         $post->tags()->sync($request->input('tags', []));
-           return response()->json([
 
-                'post'=>new PostResource($post),
-                'user'=>new UserResource($post->user),
-                'tags' => TagResource::collection($post->tags),
-           ], 200);
+        // Load relationships
+        $post->load(['user', 'tags']);
+
+        return $this->updated(
+            new PostResource($post),
+            'Post updated successfully'
+        );
     }
 
-    public function store(StorePostRequest $request)
+    /**
+     * Remove the specified post.
+     */
+    public function destroy($id)
     {
-        // التحقق من البيانات القادمة من الفورم
-        $data = $request->validated();
-
-        // تحديد المستخدم الحالي تلقائياً
-        $data['user_id'] = auth()->id();
-
-        // لو فيه صورة مرفوعة
-        if ($request->hasFile('image')) {
-            // تخزين الصورة داخل فولدر images داخل storage/app/public
-          $path = $request->file('image')->store('uploads', 'public');
-
-
-            // حفظ المسار داخل قاعدة البيانات
-            $data['image'] = $path;
-        }
-
-        // إنشاء البوست
-        $post = Post::create($data);
-        $post->tags()->sync($request->input('tags', []));
-
-        // إعادة التوجيه بعد النجاح
-        return response()->json([
-
-                'post'=>new PostResource($post),
-                'user'=>new UserResource($post->user),
-                'tags' => TagResource::collection($post->tags),
-           ], 200 );
-    }
-
-     public function destroy($id)
-    {
-
-        $post=Post::findorfail($id);
+        $post = Post::findOrFail($id);
         $post->delete();
-       return response()->json([
-        'message' => 'Post deleted successfully '
-    ], 200);
-    }
 
+        return $this->deleted('Post deleted successfully');
+    }
 }
+
