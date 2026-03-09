@@ -17,10 +17,13 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 class PostController extends Controller
 {
-     public function show($id)
+    public function __construct()
     {
-        $post= Post::findorfail($id);
+       $this->authorizeResource(Post::class, 'post');
+    }
 
+     public function show(Post $post)
+    {
         return view('posts.show',['post'=>$post]);
     }
 
@@ -56,15 +59,13 @@ class PostController extends Controller
 
     public function create()
     {
-        Gate::authorize('create-post');
         $tags=Tag::select('id','name')->get();
         return view('posts.add',compact('tags') );
     }
 
 
-    public function edit($id)
+    public function edit(Post $post)
     {
-        $post=Post::findorfail($id);
         $tags=Tag::select('id','name')->get();
         $users=User::select('id','name')->get();
         return view('posts.edit',['post'=>$post,'tags'=>$tags,'users'=>$users ]);
@@ -73,9 +74,8 @@ class PostController extends Controller
    
 
 
-     public function update($id ,UpdatePostRequest $request)
+     public function update(UpdatePostRequest $request, Post $post)
     {
-        $post=Post::findorfail($id);
         $old_image=$post->image;
 
         // التحقق من البيانات القادمة من الفورم
@@ -108,7 +108,6 @@ class PostController extends Controller
 
 public function store(StorePostRequest $request)
     {
-        Gate::authorize('create-post');
         // التحقق من البيانات القادمة من الفورم
         $data = $request->validated();
 
@@ -135,10 +134,8 @@ public function store(StorePostRequest $request)
 
 
 
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-
-        $post=Post::findorfail($id);
         $post->delete();
         return redirect()->back()->with('success', 'Post deleted successfully!');
     }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\tag;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Gate;
 class TagController extends Controller
 {
@@ -12,13 +12,13 @@ class TagController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('can:admin-control');
+        $this->authorizeResource(Tag::class, 'tag');
     }
     public function index()
     {
         //
 
-        $tags=tag::paginate(15);
+        $tags=Tag::paginate(15);
         return view('tags.index',compact('tags'));
     }
 
@@ -40,7 +40,7 @@ class TagController extends Controller
         $data = $request->validate([
             'name' => 'required|string|min:3|max:100',
         ]);
-        tag::create($data);
+        Tag::create($data);
         return redirect()->route('tags.index')->with('success','Tag created successfully');
     }
 
@@ -55,17 +55,16 @@ class TagController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Tag $tag)
     {
         //
-        $tag = tag::findOrFail($id);
         return view('tags.edit', compact('tag'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, tag $tag)
+    public function update(Request $request, Tag $tag)
     {
         //
 
@@ -79,7 +78,7 @@ class TagController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(tag $tag)
+    public function destroy(Tag $tag)
     {
         //
         $tag->delete();

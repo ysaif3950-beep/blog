@@ -1,24 +1,32 @@
 <?php
 
-namespace App\Http\Controllers\Api;
-use App\Models\tag;
+namespace App\Http\Controllers\Api\V1;
+use App\Models\Tag;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\TagResource;
+use App\Http\Resources\Api\V1\TagResource;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+
+use App\Http\Requests\Api\V1\StoreTagRequest;
+use App\Http\Requests\Api\V1\UpdateTagRequest;
 
 class TagController extends Controller
 {
     use ApiResponse;
+
+    public function __construct()
+    {
+        $this->authorizeResource(Tag::class, 'tag');
+    }
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $tags = tag::paginate(15);
+        $tags = Tag::paginate(15);
         return $this->paginated(
-            TagResource::collection($tags),
+            TagResource ::collection($tags),
             'Tags retrieved successfully'
         );
     }
@@ -26,13 +34,11 @@ class TagController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreTagRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|min:3|max:100',
-        ]);
+        $data = $request->validated();
 
-        $tag = tag::create($data);
+        $tag = Tag::create($data);
         
         return $this->created(
             new TagResource($tag),
@@ -43,7 +49,7 @@ class TagController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(tag $tag)
+    public function show(Tag $tag)
     {
         return $this->successWithResource(
             new TagResource($tag),
@@ -54,11 +60,9 @@ class TagController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, tag $tag)
+    public function update(UpdateTagRequest $request, Tag $tag)
     {
-        $data = $request->validate([
-            'name' => 'required|string|min:3|max:100',
-        ]);
+        $data = $request->validated();
 
         $tag->update($data);
 
@@ -71,7 +75,7 @@ class TagController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(tag $tag)
+    public function destroy(Tag $tag)
     {
         $tag->posts()->detach();
         $tag->delete();

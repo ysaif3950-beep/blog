@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:admin-control');
+        $this->authorizeResource(User::class, 'user');
     }
 
     //
@@ -35,9 +35,8 @@ class UserController extends Controller
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
-   public function edit($id)
+   public function edit(User $user)
 {
-    $user = User::findOrFail($id);
     return view('users.edit', compact('user'));
 }
 

@@ -2,27 +2,27 @@
 
 namespace App\Policies;
 
+use App\Models\Post;
 use App\Models\User;
-use App\Models\Tag;
 use Illuminate\Auth\Access\Response;
 
-class TagPolicy
+class PostPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        // جميع المستخدمين يمكنهم رؤية قائمة الـ tags
+        // جميع المستخدمين يمكنهم رؤية قائمة المقالات
         return true;
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Tag $tag): bool
+    public function view(User $user, Post $post): bool
     {
-        // جميع المستخدمين يمكنهم رؤية أي tag
+        // جميع المستخدمين يمكنهم رؤية أي مقال
         return true;
     }
 
@@ -31,40 +31,41 @@ class TagPolicy
      */
     public function create(User $user): bool
     {
-        return $user->role=='admin';
+        // أي مستخدم مسجل يمكنه إنشاء مقال
+        return true;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Tag $tag): bool
+    public function update(User $user, Post $post): bool
     {
-        // فقط الـ admin يمكنه تعديل الـ tags
-        return $user->role === 'admin';
+        // صاحب المقال أو الـ admin يمكنهم التعديل
+        return $user->id === $post->user_id || $user->role === 'admin';
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Tag $tag): bool
+    public function delete(User $user, Post $post): bool
     {
-        // فقط الـ admin يمكنه حذف الـ tags
-        return $user->role === 'admin';
+        // صاحب المقال أو الـ admin يمكنهم الحذف
+        return $user->id === $post->user_id || $user->role === 'admin';
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Tag $tag): bool
+    public function restore(User $user, Post $post): bool
     {
-        // فقط الـ admin يمكنه استرجاع tags محذوفة
+        // فقط الـ admin يمكنه استرجاع المقالات المحذوفة
         return $user->role === 'admin';
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Tag $tag): bool
+    public function forceDelete(User $user, Post $post): bool
     {
         // فقط الـ admin يمكنه الحذف النهائي
         return $user->role === 'admin';

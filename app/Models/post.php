@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Support\Facades\Storage;
+
 class Post extends Model
 {
     use HasFactory;
@@ -21,12 +23,13 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    // ✅ هنا التعديل - غيّرنا الاسم بس
-    public function getImageUrlAttribute()  // 👈 شيلنا "Default" من الاسم
+    // ✅ هنا التعديل - استخدام Storage
+    public function getImageUrlAttribute()
     {
-        return $this->image
-            ? asset('storage/' . $this->image)
-            : asset('storage/uploads/default.png');
+        if ($this->image && Storage::disk('public')->exists($this->image)) {
+             return Storage::url($this->image);
+        }
+        return Storage::url('uploads/default.png');
     }
     public function tags(){
         return $this->belongsToMany(Tag::class);

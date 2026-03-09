@@ -9,6 +9,8 @@ use App\Traits\ApiResponse;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
@@ -16,7 +18,7 @@ class AuthController extends Controller
 {
     //
     use ApiResponse;
- 
+
      public function register(RegisterRequest $request){
         $user=User::create([
             'name'=>$request->name,
@@ -47,7 +49,7 @@ class AuthController extends Controller
     public function logout(Request $request){
         $request->user()->currentAccessToken()->delete();
         return $this->success('Logged out successfully');
-    }   
+    }
 public function user(Request $request){
     return $this->success(new UserResource($request->user()));
 }
@@ -60,5 +62,27 @@ public function user(Request $request){
             'user' => new UserResource($request->user())
         ]);
     }
-    
+    public function  forgotPassword(ForgotPasswordRequest $request){
+           $status = Password::sendResetLink(
+           $request->only('email')
+    );
+return $status === Password::RESET_LINK_SENT
+    ? $this->success(null, 'Reset link sent')
+    : $this->success(null, 'If your email exists, a reset link has been sent');
+   }
+   public function resetPassword(ResetPasswordRequest $request){
+$status=Password::reset($request->only('email','password','password_confirmation','token'),
+    function(User $user,string $password ){
+    $user->forceFill([
+        'password'=>Hash::make($password),
+        'remember_token'=>Str::random(60),
+    ]);
+    $user->save();
+    event(new PasswordReset($user));
+});
+return $status === Password::PASSWORD_RESET
+    ? $this->success(null, 'Password reset successfully')
+    : $this->error('Invalid token or email', 400);
+
+ }
 }

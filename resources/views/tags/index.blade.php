@@ -1,7 +1,7 @@
 @extends('layout.app')
 @section('content')
     <div class="col-12">
-          @can('create,/App/models/tag::class')
+          @can('create', \App\Models\Tag::class)
 
         <a href="{{ url('tags/create') }}" class="btn btn-primary my-3">Add New Tag</a>
         @endcan

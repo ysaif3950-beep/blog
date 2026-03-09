@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1;
 use App\Models\Post;
 use App\Models\Tag;
-use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdatePostRequest;
-use App\Http\Resources\PostResource;
-use App\Http\Resources\TagResource;
-use App\Http\Resources\UserResource;
+use App\Http\Requests\Api\V1\StorePostRequest;
+use App\Http\Requests\Api\V1\UpdatePostRequest;
+use App\Http\Resources\Api\V1\PostResource;
+use App\Http\Resources\Api\V1\TagResource;
+use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -17,10 +17,11 @@ use App\Traits\ApiResponse;
 class PostController extends Controller
 {
     use ApiResponse;
-
-    /**
-     * Display a listing of posts.
-     */
+ public function __construct()
+    {
+        $this->authorizeResource(Post::class, 'post');
+    }
+    
     public function index()
     {
         $posts = Post::orderBy('id', 'desc')->paginate(15);
@@ -30,11 +31,10 @@ class PostController extends Controller
         );
     }
 
-    /**
-     * Home page posts listing.
-     */
     public function home()
     {
+        $this->authorize('viewAny', Post::class);
+
         $posts = Post::orderBy('id', 'desc')->paginate(15);
         return $this->paginated(
             PostResource::collection($posts),
@@ -42,23 +42,18 @@ class PostController extends Controller
         );
     }
 
-    /**
-     * Display the specified post.
-     */
-    public function show($id)
+       public function show(Post $post)
     {
-        $post = Post::with(['user', 'tags'])->findOrFail($id);
+        $post = Post::with(['user', 'tags'])->findOrFail($post->id);
         return $this->successWithResource(
             new PostResource($post),
             'Post retrieved successfully'
         );
     }
 
-    /**
-     * Search for posts.
-     */
     public function search(Request $request)
     {
+        $this->authorize('viewAny', Post::class);
         $posts = Post::with(['user', 'tags'])
             ->where(function ($q) use ($request) {
                 $q->where('title', 'like', "%{$request->search}%")
@@ -72,9 +67,6 @@ class PostController extends Controller
         );
     }
 
-    /**
-     * Get data for creating a new post.
-     */
     public function create()
     {
         $tags = Tag::select('id', 'name')->get();
@@ -84,12 +76,8 @@ class PostController extends Controller
         );
     }
 
-    /**
-     * Get data for editing a post.
-     */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        $post = Post::findOrFail($id);
         $tags = Tag::select('id', 'name')->get();
         $users = User::select('id', 'name')->get();
 
@@ -100,9 +88,6 @@ class PostController extends Controller
         ], 'Post edit data retrieved successfully');
     }
 
-    /**
-     * Store a newly created post.
-     */
     public function store(StorePostRequest $request)
     {
         $data = $request->validated();
@@ -116,7 +101,6 @@ class PostController extends Controller
         $post = Post::create($data);
         $post->tags()->sync($request->input('tags', []));
 
-        // Load relationships
         $post->load(['user', 'tags']);
 
         return $this->created(
@@ -125,12 +109,8 @@ class PostController extends Controller
         );
     }
 
-    /**
-     * Update the specified post.
-     */
-    public function update(UpdatePostRequest $request, $id)
+    public function update(UpdatePostRequest $request,  Post $post)
     {
-        $post = Post::findOrFail($id);
         $old_image = $post->image;
         $data = $request->validated();
 
@@ -156,12 +136,8 @@ class PostController extends Controller
         );
     }
 
-    /**
-     * Remove the specified post.
-     */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        $post = Post::findOrFail($id);
         $post->delete();
 
         return $this->deleted('Post deleted successfully');

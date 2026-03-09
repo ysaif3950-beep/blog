@@ -1,7 +1,9 @@
 @extends('layout.app')
 @section('content')
     <div class="col-12">
+        @can('create', \App\Models\User::class)
         <a href="{{ url('users/create') }}" class="btn btn-primary my-3">Add New User</a>
+        @endcan
         <h1 class="p-3 border text-center my-3">All Users</h1>
     </div>
 
@@ -40,14 +42,18 @@
 
 
                         <td>
+                            @can('update', $user)
                             <a href="{{ url('users/' . $user->id . '/edit') }}" class="btn btn-info btn-sm">Edit</a>
+                            @endcan
                         </td>
                         <td>
                             <form action="{{ url('users/' . $user->id) }}" method="post" class="d-inline">
                                 @method('DELETE')
                                 @csrf
+                                @can('delete', $user)
                                 <input type="submit" value="Delete" class="btn btn-danger btn-sm"
                                     onclick="return confirm('Are you sure you want to delete this user?')">
+                                @endcan
                             </form>
                         </td>
                     </tr>

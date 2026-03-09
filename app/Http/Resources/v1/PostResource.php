@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\Models\tag;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Support\Str;
 
