@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 //Route::get('/', function () {
    // return view('home');
 //});
+
 Route::middleware('auth')->group(function () {
 
 Route::get('/', [PostController::class, 'home'])->name('dashboard');

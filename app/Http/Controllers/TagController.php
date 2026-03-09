@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreTagRequest;
+use App\Http\Requests\UpdateTagRequest;
 use App\Models\Tag;
-use Illuminate\Support\Facades\Gate;
+
 class TagController extends Controller
 {
     /**
@@ -34,14 +35,11 @@ class TagController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreTagRequest $request)
     {
-        //
-        $data = $request->validate([
-            'name' => 'required|string|min:3|max:100',
-        ]);
+        $data = $request->validated();
         Tag::create($data);
-        return redirect()->route('tags.index')->with('success','Tag created successfully');
+        return redirect()->route('tags.index')->with('success', 'Tag created successfully');
     }
 
     /**
@@ -64,13 +62,9 @@ class TagController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Tag $tag)
+    public function update(UpdateTagRequest $request, Tag $tag)
     {
-        //
-
-        $data = $request->validate([
-            'name' => 'required|string|min:3|max:100',
-        ]);
+        $data = $request->validated();
         $tag->update($data);
         return redirect()->route('tags.index')->with('success', 'Tag updated successfully.');
     }
