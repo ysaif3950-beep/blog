@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\v1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -16,11 +16,11 @@ class UserResource extends JsonResource
     {
         return [
 
-            'id'=>$this->id,
-            'name'=>$this->name,
-            'email'=>$this->email,
-            'role'=>$this->role,
-            'posts'=>PostResource::collection($this->whenLoaded('posts')),
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'role' => $this->role,
+            'posts' => PostResource::collection($this->whenLoaded('posts')),
         ];
     }
 }

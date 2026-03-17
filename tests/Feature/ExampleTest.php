@@ -2,22 +2,32 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     */
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAs(User::factory()->create());
+    }
+
     public function test_the_application_returns_a_successful_response(): void
     {
         $response = $this->get('/');
 
-        $response->assertStatus(200);
+        $response->assertOk();
     }
-    public function test_get_post(){
-        $response = $this->get('posts');
-        $response->assertStatus(200);
+
+    public function test_get_post(): void
+    {
+        $response = $this->get('/posts');
+
+        $response->assertOk();
     }
 }
