@@ -33,7 +33,7 @@ class AuthController extends Controller
         event(new Registered($user));
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        return $this->success([
+        return $this->created([
             'token' => $token,
             'user' => new UserResource($user),
         ]);

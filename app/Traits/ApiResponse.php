@@ -12,7 +12,7 @@ trait ApiResponse
     protected function success(
         mixed $data = null,
         string $message = 'Mission completed successfully',
-        int $code = 201
+        int $code = 200
     ): JsonResponse {
 
         $response = [
@@ -34,7 +34,7 @@ trait ApiResponse
     ): JsonResponse {
 
         $response = [
-            'status' => 'error',
+            'success' => false,
             'message' => $message,
         ];
 
@@ -63,7 +63,7 @@ trait ApiResponse
     protected function deleted(string $message = 'Resource deleted successfully'): JsonResponse
     {
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => $message,
         ], 200);
     }
@@ -102,7 +102,7 @@ trait ApiResponse
         int $code = 200
     ): JsonResponse {
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => $message,
             'data' => $resource,
         ], $code);
@@ -117,7 +117,7 @@ trait ApiResponse
         int $code = 200
     ): JsonResponse {
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => $message,
             'data' => $collection,
         ], $code);
@@ -139,7 +139,7 @@ trait ApiResponse
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => $message,
             'data' => $paginatedData instanceof \Illuminate\Http\Resources\Json\ResourceCollection
                 ? $paginatedData->items()
