@@ -30,6 +30,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+        $user->refresh();
+
         event(new Registered($user));
         $token = $user->createToken('auth-token')->plainTextToken;
 

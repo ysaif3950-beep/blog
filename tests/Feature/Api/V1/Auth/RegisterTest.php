@@ -37,15 +37,24 @@ class RegisterTest extends ApiTestCase
                     'token',
                     'user' => ['id', 'name', 'email', 'role'],
                 ],
-            ]);
+            ])
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.user.name', $data['name'])
+            ->assertJsonPath('data.user.email', $data['email'])
+            ->assertJsonPath('data.user.role', 'user')
+            ->assertJsonMissingPath('data.user.password')
+            ->assertJsonMissingPath('data.user.remember_token');
 
         $this->assertDatabaseHas('users', [
             'email' => $data['email'],
             'name' => $data['name'],
+            'role' => 'user',
         ]);
 
         $user = User::where('email', $data['email'])->first();
 
+        $this->assertIsString($response->json('data.token'));
+        $this->assertNotSame('', $response->json('data.token'));
         $this->assertTrue(Hash::check($data['password'], $user->password));
     }
 
