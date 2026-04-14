@@ -1,0 +1,115 @@
+[33mcommit f54dc1f7ab2296500f666bc649eeba2744684001[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Fri Apr 3 18:01:49 2026 +0200
+
+    Refactor authentication and user management
+    
+    - Added role assignment during user registration.
+    - Updated login and logout methods to return JsonResponse.
+    - Enhanced user profile retrieval to include user's posts.
+    - Removed unused request classes and consolidated request validation.
+    - Improved code formatting and consistency across controllers.
+    - Added tests for logout functionality and user profile retrieval.
+
+[33mcommit e038d5bd389d635435c673681ed1378c438f42ef[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Wed Mar 25 22:07:05 2026 +0200
+
+    feat: refresh user data after registration and enhance registration test assertions
+
+[33mcommit 6bd6ddeeaf9a91e9ac6576410d18129c59b68f97[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Tue Mar 24 00:23:17 2026 +0200
+
+    feat: enhance authentication responses and improve login request validation
+
+[33mcommit 18da3ea44ac255252c7b5de4321455eb6a2f00d4[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Thu Mar 19 16:18:43 2026 +0200
+
+    feat: add Laravel Boost guidelines, configuration files, and initial login test
+
+[33mcommit 036d107eec539dc0cca06acb7b75c5ff7bc47476[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Tue Mar 17 20:19:37 2026 +0200
+
+    feat: implement API V1 user registration with dedicated controller, request validation, resources, and comprehensive feature tests.
+
+[33mcommit 140e3f11fecbe9260bffc38ed452b89daec5617e[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Mon Mar 9 15:54:01 2026 +0200
+
+    feat: Implement API authentication, tag resource management, and initial API feature tests.
+
+[33mcommit 5d6cf63041303b9595bc9719769b0d657cb3ca97[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Mon Mar 9 15:52:16 2026 +0200
+
+    feat: Implement a comprehensive blog application with API endpoints, authentication, authorization, and UI for posts, tags, and users.
+
+[33mcommit 7a1d96d208ad98399d92ba47b73c4c1c0144d2fb[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Thu Jan 8 14:34:51 2026 +0200
+
+    feat: Implement comprehensive API authentication and enhance controllers
+    
+    - Add complete authentication system with Laravel Sanctum
+      * AuthController with register, login, logout, refresh token
+      * LoginRequest and RegisterRequest validation
+      * API token-based authentication
+    
+    - Enhance API Controllers structure
+      * Refactor PostController with improved responses
+      * Update TagController and UserController
+      * Implement ApiResponse trait for consistent API responses
+    
+    - Update Models and Routes
+      * Add HasApiTokens trait to User model
+      * Update API routes with proper authentication endpoints
+      * Configure Sanctum for API authentication
+    
+    - Update dependencies
+      * Configure Composer for Laravel Sanctum integration
+    
+    This commit establishes a solid foundation for RESTful API development
+    with proper authentication, validation, and response formatting.
+
+[33mcommit ca57078445dad411f91e365eebf9ddfeb3cc3fce[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Mon Dec 15 23:26:30 2025 +0200
+
+    Separate API controllers and routes for posts and tags
+
+[33mcommit bf6bd76283647985361b717386c0faba1840db33[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Sat Dec 13 20:35:16 2025 +0200
+
+    Add API endpoints for Posts with Resources and handle image upload
+
+[33mcommit 10092f7a525b0cebea289896ca178eae2ac5dd15[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Thu Nov 13 09:09:54 2025 +0200
+
+    Add tag relationships and views cleanup
+    - enable selecting multiple tags when creating posts
+    - fix undefined variable when syncing post tags
+    - add posts relationship to tag model for tags index view
+    - tidy tags views for listing and editing
+
+[33mcommit 7bc542448613708ca7969ac23d6b94ca31505a49[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Fri Sep 5 22:21:42 2025 +0300
+
+    Add User and Post seeders with factories, fix posts migration, and link posts to users
+
+[33mcommit fd8fd31f992a90a1aa10e230b69b4125870c374a[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Tue Aug 26 23:03:59 2025 +0300
+
+    fix: تعديل في PostController واضافة موديل post
+
+[33mcommit 8dcdf6260bfa06e165d10d21f960d0b157b99114[m
+Author: Saif yasser <ysaif3950@gmail.ccom>
+Date:   Mon Aug 25 17:22:26 2025 +0300
+
+    first commit
