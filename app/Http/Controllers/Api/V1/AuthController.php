@@ -41,7 +41,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $user = User::where('email', $request->email)->first();
         if (! $user || ! Hash::check($request->password, $user->password)) {
@@ -55,22 +55,23 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 
-        return $this->success('Logged out successfully');
+        return $this->success(null, 'Logged out successfully');
     }
 
-    public function user(Request $request)
+    public function user(Request $request): JsonResponse
     {
         return $this->success(new UserResource($request->user()));
     }
 
-    public function refresh(Request $request)
+    public function refresh(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
-        $token = $request->user()->createToken('auth-token')->plainTextToken;
+        $user = $request->user();
+        $user->currentAccessToken()->delete();
+        $token = $user->createToken('auth-token')->plainTextToken;
 
         return $this->success([
             'token' => $token,
@@ -78,7 +79,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function forgotPassword(ForgotPasswordRequest $request)
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         $status = Password::sendResetLink(
             $request->only('email')
@@ -89,7 +90,7 @@ class AuthController extends Controller
             : $this->success(null, 'If your email exists, a reset link has been sent');
     }
 
-    public function resetPassword(ResetPasswordRequest $request)
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
         $status = Password::reset($request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {
