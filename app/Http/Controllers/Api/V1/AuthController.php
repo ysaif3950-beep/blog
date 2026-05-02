@@ -64,7 +64,9 @@ class AuthController extends Controller
 
     public function user(Request $request): JsonResponse
     {
-        return $this->success(new UserResource($request->user()));
+          $user = $request->user()->load('posts');
+
+        return $this->success(new UserResource($user));
     }
 
     public function refresh(Request $request): JsonResponse
