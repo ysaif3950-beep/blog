@@ -49,6 +49,21 @@ return [
 
     'expiration' => null,
 
+
+    /*
+|--------------------------------------------------------------------------
+| Refresh Token Expiration Minutes
+|--------------------------------------------------------------------------
+|
+| This value controls the number of minutes a token remains valid
+| without activity. If the user does not refresh the token within
+| this period, the token will be considered expired and the user
+| will be required to log in again.
+|
+*/
+
+'refresh_ttl' => env('SANCTUM_REFRESH_TTL', 30),
+
     /*
     |--------------------------------------------------------------------------
     | Token Prefix

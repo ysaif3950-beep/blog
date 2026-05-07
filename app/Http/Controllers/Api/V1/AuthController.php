@@ -70,16 +70,40 @@ class AuthController extends Controller
     }
 
     public function refresh(Request $request): JsonResponse
-    {
-        $user = $request->user();
-        $user->currentAccessToken()->delete();
-        $token = $user->createToken('auth-token')->plainTextToken;
+{
+    $user = $request->user();
+    $token = $user->currentAccessToken();
 
-        return $this->success([
-            'token' => $token,
-            'user' => new UserResource($request->user()),
-        ]);
+   
+    if (!$token) {
+        return $this->error('Invalid token', 401);
     }
+
+    $currentDevice = substr(hash('sha256', $request->userAgent()), 0, 32);
+    if ($token->name !== $currentDevice) {
+        return $this->error('Invalid device', 403);
+    }
+
+    $lastActivity = $token->last_used_at ?? $token->created_at;
+    if ($lastActivity->lt(now()->subMinutes(config('sanctum.refresh_ttl', 30)))) {
+        $token->delete();
+        return $this->error('Session expired, please login again', 401);
+    }
+
+    $token->delete();
+
+    $newToken = $user->createToken(
+        name: $currentDevice,
+        abilities: ['*'],
+        expiresAt: now()->addMinutes(config('sanctum.expiration', 60))
+    )->plainTextToken;
+
+    return $this->success([
+        'token'      => $newToken,
+        'expires_in' => config('sanctum.expiration', 60) * 60,
+        'user'       => new UserResource($user),
+    ]);
+}
 
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
