@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\ChangePasswordRequest;
 use App\Http\Requests\Api\V1\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\LoginRequest;
 use App\Http\Requests\Api\V1\RegisterRequest;
@@ -64,18 +65,17 @@ class AuthController extends Controller
 
     public function user(Request $request): JsonResponse
     {
-          $user = $request->user()->load('posts');
+        $user = $request->user()->load('posts');
 
         return $this->success(new UserResource($user));
     }
 
-    public function refresh(Request $request): JsonResponse
+   public function refresh(Request $request): JsonResponse
 {
     $user = $request->user();
     $token = $user->currentAccessToken();
 
-   
-    if (!$token) {
+    if (! $token) {
         return $this->error('Invalid token', 401);
     }
 
@@ -84,17 +84,10 @@ class AuthController extends Controller
         return $this->error('Invalid device', 403);
     }
 
-    $lastActivity = $token->last_used_at ?? $token->created_at;
-    if ($lastActivity->lt(now()->subMinutes(config('sanctum.refresh_ttl', 30)))) {
-        $token->delete();
-        return $this->error('Session expired, please login again', 401);
-    }
-
     $token->delete();
 
     $newToken = $user->createToken(
         name: $currentDevice,
-        abilities: ['*'],
         expiresAt: now()->addMinutes(config('sanctum.expiration', 60))
     )->plainTextToken;
 
@@ -104,6 +97,19 @@ class AuthController extends Controller
         'user'       => new UserResource($user),
     ]);
 }
+
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        $user = $request->user();
+        $user->update(['password' => Hash::make($request->new_password)]);
+        $user->tokens()->delete();
+        $newToken = $user->createToken('auth-token')->plainTextToken;
+
+        return $this->success([
+            'token' => $newToken,
+            'user' => new UserResource($user),
+        ], 'Password changed successfully');
+    }
 
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
