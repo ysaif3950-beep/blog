@@ -13,7 +13,6 @@ abstract class ApiTestCase extends TestCase
 
     protected string $baseUrl = '/api/v1';
 
-    /** يرجع user مسجل دخول مع Sanctum token */
     protected function actingAsUser(?User $user = null): User
     {
         $user ??= User::factory()->create();
@@ -22,7 +21,6 @@ abstract class ApiTestCase extends TestCase
         return $user;
     }
 
-    /** Helper لإرسال JSON requests */
     protected function apiGet(string $uri, array $headers = []): TestResponse
     {
         return $this->getJson($this->baseUrl.$uri, $headers);

@@ -33,6 +33,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::get('/user', [AuthController::class, 'user']);
             Route::post('/refresh', [AuthController::class, 'refresh']);
+            Route::post('/change-password', [AuthController::class, 'changePassword']);
         });
 
         Route::get('posts/search', [PostController::class, 'search'])
