@@ -70,33 +70,33 @@ class AuthController extends Controller
         return $this->success(new UserResource($user));
     }
 
-   public function refresh(Request $request): JsonResponse
-{
-    $user = $request->user();
-    $token = $user->currentAccessToken();
+    public function refresh(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $token = $user->currentAccessToken();
 
-    if (! $token) {
-        return $this->error('Invalid token', 401);
+        if (! $token) {
+            return $this->error('Invalid token', 401);
+        }
+
+        $currentDevice = substr(hash('sha256', $request->userAgent()), 0, 32);
+        if ($token->name !== $currentDevice) {
+            return $this->error('Invalid device', 403);
+        }
+
+        $token->delete();
+
+        $newToken = $user->createToken(
+            name: $currentDevice,
+            expiresAt: now()->addMinutes(config('sanctum.expiration', 60))
+        )->plainTextToken;
+
+        return $this->success([
+            'token' => $newToken,
+            'expires_in' => config('sanctum.expiration', 60) * 60,
+            'user' => new UserResource($user),
+        ]);
     }
-
-    $currentDevice = substr(hash('sha256', $request->userAgent()), 0, 32);
-    if ($token->name !== $currentDevice) {
-        return $this->error('Invalid device', 403);
-    }
-
-    $token->delete();
-
-    $newToken = $user->createToken(
-        name: $currentDevice,
-        expiresAt: now()->addMinutes(config('sanctum.expiration', 60))
-    )->plainTextToken;
-
-    return $this->success([
-        'token'      => $newToken,
-        'expires_in' => config('sanctum.expiration', 60) * 60,
-        'user'       => new UserResource($user),
-    ]);
-}
 
     public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
@@ -113,13 +113,11 @@ class AuthController extends Controller
 
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        $status = Password::sendResetLink(
+        Password::sendResetLink(
             $request->only('email')
         );
 
-        return $status === Password::RESET_LINK_SENT
-            ? $this->success(null, 'Reset link sent')
-            : $this->success(null, 'If your email exists, a reset link has been sent');
+        return $this->success(null, 'If your email exists, a reset link has been sent');
     }
 
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
