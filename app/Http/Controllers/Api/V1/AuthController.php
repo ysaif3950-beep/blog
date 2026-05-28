@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\ResetPasswordEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\ChangePasswordRequest;
 use App\Http\Requests\Api\V1\ForgotPasswordRequest;
@@ -12,6 +13,7 @@ use App\Http\Resources\v1\UserResource;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -113,9 +115,10 @@ class AuthController extends Controller
 
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        Password::sendResetLink(
-            $request->only('email')
-        );
+        Password::sendResetLink($request->only('email'), function (User $user, string $token): void {
+            event(new ResetPasswordEvent($user, $token));
+            event(new PasswordResetLinkSent($user));
+        });
 
         return $this->success(null, 'If your email exists, a reset link has been sent');
     }

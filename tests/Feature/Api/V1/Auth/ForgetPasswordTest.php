@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Api\V1\Auth;
 
+use App\Events\ResetPasswordEvent;
+use App\Listeners\SendResetPasswordEmail;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -23,6 +25,7 @@ class ForgetPasswordTest extends ApiTestCase
         ]);
 
         Event::fake([PasswordResetLinkSent::class]);
+        Event::assertListening(ResetPasswordEvent::class, SendResetPasswordEmail::class);
 
         $response = $this->apiPost('/auth/forgot-password', [
             'email' => ' '.strtoupper($user->email).' ',
@@ -37,7 +40,14 @@ class ForgetPasswordTest extends ApiTestCase
             'email' => $user->email,
         ]);
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        Notification::assertSentTo($user, ResetPassword::class, function (ResetPassword $notification) use ($user): bool {
+            $resetEmail = $notification->toMail($user);
+
+            return $resetEmail->actionUrl === route('password.reset', [
+                'token' => $notification->token,
+                'email' => $user->email,
+            ]);
+        });
         Event::assertDispatched(PasswordResetLinkSent::class, fn (PasswordResetLinkSent $event): bool => $event->user->is($user));
     }
 
