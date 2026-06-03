@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Api\V1;
-
-use App\Events\ResetPasswordEvent;
+use App\Mail\WelcomeMail;
+use  Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\ChangePasswordRequest;
 use App\Http\Requests\Api\V1\ForgotPasswordRequest;
@@ -33,7 +33,9 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-        $user->refresh();
+         Mail::to($user->email)
+         ->send(new WelcomeMail($user));
+           $user->refresh();
 
         event(new Registered($user));
         $token = $user->createToken('auth-token')->plainTextToken;
@@ -113,15 +115,16 @@ class AuthController extends Controller
         ], 'Password changed successfully');
     }
 
-    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
-    {
-        Password::sendResetLink($request->only('email'), function (User $user, string $token): void {
-            event(new ResetPasswordEvent($user, $token));
-            event(new PasswordResetLinkSent($user));
-        });
+   public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+{
+    $status = Password::sendResetLink(
+        $request->only('email')
+    );
 
-        return $this->success(null, 'If your email exists, a reset link has been sent');
-    }
+    return $status === Password::RESET_LINK_SENT
+        ? $this->success(null, 'Reset link sent successfully')
+        : $this->error('Unable to send reset link', 400);
+}
 
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
