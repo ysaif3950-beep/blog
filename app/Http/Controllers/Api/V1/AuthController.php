@@ -1,23 +1,23 @@
 <?php
 
 namespace App\Http\Controllers\Api\V1;
-use App\Mail\WelcomeMail;
-use  Illuminate\Support\Facades\Mail;
+
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\ChangePasswordRequest;
 use App\Http\Requests\Api\V1\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\LoginRequest;
 use App\Http\Requests\Api\V1\RegisterRequest;
 use App\Http\Requests\Api\V1\ResetPasswordRequest;
-use App\Http\Resources\v1\UserResource;
+use App\Http\Resources\Api\V1\UserResource;
+use App\Mail\WelcomeMail;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
@@ -33,9 +33,9 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-         Mail::to($user->email)
-         ->send(new WelcomeMail($user));
-           $user->refresh();
+        Mail::to($user->email)
+            ->send(new WelcomeMail($user));
+        $user->refresh();
 
         event(new Registered($user));
         $token = $user->createToken('auth-token')->plainTextToken;
@@ -115,16 +115,16 @@ class AuthController extends Controller
         ], 'Password changed successfully');
     }
 
-   public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
-{
-    $status = Password::sendResetLink(
-        $request->only('email')
-    );
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
 
-    return $status === Password::RESET_LINK_SENT
-        ? $this->success(null, 'Reset link sent successfully')
-        : $this->error('Unable to send reset link', 400);
-}
+        return $status === Password::RESET_LINK_SENT
+            ? $this->success(null, 'Reset link sent successfully')
+            : $this->error('Unable to send reset link', 400);
+    }
 
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
