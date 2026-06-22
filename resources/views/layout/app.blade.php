@@ -5,18 +5,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'Blog App') }}</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    
+
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
+
     <!-- Animations -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
@@ -27,7 +27,7 @@
             --primary-500: #6366f1;
             --primary-400: #818cf8;
             --primary-50: #eef2ff;
-            
+
             --gray-900: #111827;
             --gray-800: #1f2937;
             --gray-700: #374151;
@@ -38,11 +38,11 @@
             --gray-200: #e5e7eb;
             --gray-100: #f3f4f6;
             --gray-50: #f9fafb;
-            
+
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            
+
             /* Spacing System (8px grid) */
             --space-1: 0.25rem;  /* 4px */
             --space-2: 0.5rem;   /* 8px */
@@ -52,7 +52,7 @@
             --space-6: 2rem;     /* 32px */
             --space-8: 3rem;     /* 48px */
             --space-10: 4rem;    /* 64px */
-            
+
             /* Typography Scale */
             --text-xs: 0.75rem;   /* 12px */
             --text-sm: 0.875rem;  /* 14px */
@@ -62,19 +62,19 @@
             --text-2xl: 1.5rem;   /* 24px */
             --text-3xl: 1.875rem; /* 30px */
             --text-4xl: 2.25rem;  /* 36px */
-            
+
             /* Line Heights */
             --leading-tight: 1.25;
             --leading-normal: 1.5;
             --leading-relaxed: 1.75;
-            
+
             /* Shadows */
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            
+
             /* Border Radius */
             --radius-sm: 0.375rem;
             --radius: 0.5rem;
@@ -148,19 +148,7 @@
             font-weight: 600;
         }
 
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -16px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 4px;
-            background: var(--primary-600);
-            border-radius: var(--radius-full);
-        }
-
-        /* Search */
+      
         .search-box {
             position: relative;
             width: 280px;
@@ -342,13 +330,13 @@
                 <i class="bi bi-layers"></i>
                 <span>Blog App</span>
             </a>
-            
+
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
                     <li class="nav-item">
@@ -412,6 +400,9 @@
                                 </a>
                             </li>
                         </ul>
+
+
+                            <li><hr class="dropdown-divider"></li>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                             @csrf
                         </form>

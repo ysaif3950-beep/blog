@@ -24,13 +24,14 @@
                         <label class="form-label" for="post-title">
                             Title <span class="text-danger">*</span>
                         </label>
-                        <input type="text" 
-                               class="form-control" 
+                        
+                        <input type="text"
+                               class="form-control"
                                id="post-title"
-                               name="title" 
-                               value="{{ old('title') }}" 
-                               placeholder="Write a descriptive title for your post" 
-                               required 
+                               name="title"
+                               value="{{ old('title') }}"
+                               placeholder="Write a descriptive title for your post"
+                               required
                                autofocus>
                         <div class="form-text">Make it clear and engaging to attract readers</div>
                     </div>
@@ -40,11 +41,11 @@
                         <label class="form-label" for="post-description">
                             Content <span class="text-danger">*</span>
                         </label>
-                        <textarea class="form-control" 
+                        <textarea class="form-control"
                                   id="post-description"
-                                  name="description" 
-                                  rows="8" 
-                                  placeholder="Write your post content here..." 
+                                  name="description"
+                                  rows="8"
+                                  placeholder="Write your post content here..."
                                   required>{{ old('description') }}</textarea>
                         <div class="form-text">Share your thoughts, ideas, or story</div>
                     </div>
@@ -52,10 +53,10 @@
                     <!-- Tags Field -->
                     <div class="mb-4">
                         <label class="form-label" for="post-tags">Tags</label>
-                        <select name="tags[]" 
+                        <select name="tags[]"
                                 id="post-tags"
-                                class="form-select" 
-                                multiple 
+                                class="form-select"
+                                multiple
                                 style="height: 120px;">
                             @foreach ($tags as $tag)
                                 <option value="{{ $tag->id }}" {{ in_array($tag->id, old('tags', [])) ? 'selected' : '' }}>
@@ -69,8 +70,8 @@
                     <!-- Image Field -->
                     <div class="mb-5">
                         <label class="form-label" for="post-image">Cover Image</label>
-                        <input type="file" 
-                               class="form-control" 
+                        <input type="file"
+                               class="form-control"
                                id="post-image"
                                name="image"
                                accept="image/*">

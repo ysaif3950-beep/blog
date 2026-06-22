@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Storage;
+
 
 class User extends Authenticatable
 {
@@ -50,4 +52,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(Post::class);
     }
+
+    public function getProfileImageUrlAttribute(): string
+    {
+    if (
+        $this->profile_image &&
+        Storage::disk('public')->exists($this->profile_image)
+    ) {
+        return Storage::url($this->profile_image);
+    }
+
+    return Storage::url('profiles/default.png');
+}
 }

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\Post;
 use App\Policies\PostPolicy;
 use App\Models\Tag;
-use App\Policies\TagPolicy; 
+use App\Policies\TagPolicy;
 use App\Models\User;
 use App\Policies\UserPolicy;
 
@@ -31,6 +31,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // Gates (اختياري)
+        Gate::define('admin-control', fn(User $user): bool => $user->role === 'admin');
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -21,20 +22,30 @@ class UserController extends Controller
         $users = User::orderBy('id', 'desc')->paginate(15);
         return view('users.index', compact('users'));
     }
+
     public function create()
     {
         return view('users.create');
     }
     public function store(StoreUserRequest $request)
-    {
+        {
         $data = $request->validated();
 
         $data['password'] = bcrypt($data['password']);
 
+        if ($request->hasFile('profile_image')) {
+            $data['profile_image'] = $request
+                ->file('profile_image')
+                ->store('profiles', 'public');
+        }
+
         User::create($data);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User created successfully.');
     }
+
    public function edit(User $user)
 {
     return view('users.edit', compact('user'));
@@ -42,8 +53,8 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, User $user)
 {
-   $data = $request->validated();
-    if($request->filled('password')){
+     $data = $request->validated();
+       if($request->filled('password')){
         $data['password']=bcrypt($data['password']);
     }
         else{
@@ -69,6 +80,11 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         return view('users.posts', compact('user'));
+    }
+    public function profile()
+    {
+        $user = auth()->user();
+        return view('users.profile', compact('user'));
     }
 
 }
