@@ -1,45 +1,99 @@
 @extends('layout.app')
+
 @section('content')
- <div class="col-12">
-    <h1 class="p-3 border text-center my-3">Edit User info</h1>
-</div>
-            @include('layout.message')
-            @include('layout.error')
-
-
-
-<div class="col-8 mx-auto">
-    <form action="{{ route('users.update',  $user->id) }}" method="post" class="form border p-3">
-        @csrf
-        @method('put')
-        <div class="mb-3">
-            <label for="">User Name</label>
-
-            <input type="text" value="{{ $user->name }}" class="form-control" name="name">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+        <!-- Header -->
+        <div class="mb-4">
+            <h1 style="font-size: var(--text-3xl); font-weight: 700;">Edit User</h1>
+            <p class="text-muted" style="font-size: var(--text-base);">Update this account details and access level</p>
         </div>
 
-        <div class="mb-3">
-            <label for="">User Email</label>
-            <input type="email" value="{{ $user->email }}" class="form-control" name="email">
-        </div>
+        @include('layout.message')
+        @include('layout.error')
 
-        <div class="mb-3">
-            <label for="">User Password</label>
-            <input type="password" class="form-control" name="password">
-        </div>
-        </div>
+        <!-- Form Card -->
+        <div class="card">
+            <div class="card-body" style="padding: var(--space-6);">
+                <form action="{{ route('users.update', $user->id) }}" method="post">
+                    @csrf
+                    @method('put')
 
-      <div class="mb-3">
-            <label class="form-label">User Role</label>
-            <select name="role" class="form-control">
-                <option @selected($user->role == 'admin') value="admin">Admin</option>
-                <option @selected($user->role == 'user') value="user">User</option>
-            </select>
-        </div>
+                    <!-- Name Field -->
+                    <div class="mb-4">
+                        <label class="form-label" for="user-name">
+                            User Name <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="user-name"
+                               name="name"
+                               value="{{ old('name', $user->name) }}"
+                               placeholder="Enter the user's full name"
+                               required
+                               autofocus>
+                        <div class="form-text">Use the name that should appear across the blog</div>
+                    </div>
 
-        <div class="mb-3">
-            <input type="submit" class="form-control bg-success text-white" value="Save">
+                    <!-- Email Field -->
+                    <div class="mb-4">
+                        <label class="form-label" for="user-email">
+                            User Email <span class="text-danger">*</span>
+                        </label>
+                        <input type="email"
+                               class="form-control"
+                               id="user-email"
+                               name="email"
+                               value="{{ old('email', $user->email) }}"
+                               placeholder="name@example.com"
+                               required>
+                        <div class="form-text">This email will be used for login and notifications</div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <label class="form-label" for="user-password">Password</label>
+                        <input type="password"
+                               class="form-control"
+                               id="user-password"
+                               name="password"
+                               placeholder="Enter a new password">
+                        <div class="form-text">Leave it blank to keep the current password</div>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="mb-4">
+                        <label class="form-label" for="user-password-confirmation">Confirm Password</label>
+                        <input type="password"
+                               class="form-control"
+                               id="user-password-confirmation"
+                               name="password_confirmation"
+                               placeholder="Repeat the new password">
+                    </div>
+
+                    <!-- Role Field -->
+                    <div class="mb-5">
+                        <label class="form-label" for="user-role">
+                            User Role <span class="text-danger">*</span>
+                        </label>
+                        <select name="role" id="user-role" class="form-select" required>
+                            <option value="admin" @selected(old('role', $user->role) === 'admin')>Admin</option>
+                            <option value="user" @selected(old('role', $user->role) === 'user')>User</option>
+                        </select>
+                        <div class="form-text">Choose whether this account can manage the app or only use it</div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex gap-3 pt-4 border-top">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-lg"></i>
+                            Update User
+                        </button>
+                        <a href="{{ route('users.index') }}" class="btn btn-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
 @endsection

@@ -400,9 +400,6 @@
                                 </a>
                             </li>
                         </ul>
-
-
-                            <li><hr class="dropdown-divider"></li>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                             @csrf
                         </form>

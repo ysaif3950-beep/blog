@@ -24,28 +24,28 @@
         <div class="row g-4 mb-5">
             @foreach ($posts as $post)
                 <div class="col-12 col-md-6 col-lg-4">
-                    <article class="card h-100">
+                    <article class="card h-100 position-relative">
                         <!-- Post Image -->
                         <div class="position-relative" style="height: 200px; overflow: hidden; background-color: var(--gray-100);">
                             @if($post->image_url)
-                                <img src="{{ $post->image_url }}" 
-                                     class="w-100 h-100 object-fit-cover" 
+                                <img src="{{ $post->image_url }}"
+                                     class="w-100 h-100 object-fit-cover"
                                      alt="{{ $post->title }}"
                                      style="transition: transform 0.3s ease;">
                             @else
                                 <div class="d-flex align-items-center justify-content-center h-100">
-                                    <i class="bi bi-image" style="font-size: 3rem; color: var(--gray-300);"></i>
+                                 <i class="bi bi-image" style="font-size: 3rem; color: var(--gray-300);"></i>
                                 </div>
                             @endif
                         </div>
-                        
+
                         <!-- Post Content -->
                         <div class="card-body d-flex flex-column" style="padding: var(--space-5);">
                             <!-- Tags -->
                             @if($post->tags->count() > 0)
                                 <div class="mb-3">
                                     @foreach ($post->tags->take(3) as $tag)
-                                        <span class="badge text-primary bg-primary-light me-1 mb-1" 
+                                        <span class="badge text-primary bg-primary-light me-1 mb-1"
                                               style="font-weight: 500; padding: var(--space-1) var(--space-3); font-size: var(--text-xs);">
                                             {{ $tag->name }}
                                         </span>
@@ -60,9 +60,11 @@
 
                             <!-- Title -->
                             <h3 class="mb-2" style="font-size: var(--text-xl); font-weight: 600; line-height: var(--leading-tight);">
-                                {{ Str::limit($post->title, 60) }}
+                                <a href="{{ url('posts/' . $post->id) }}" class="stretched-link text-decoration-none text-reset">
+                                    {{ Str::limit($post->title, 60) }}
+                                </a>
                             </h3>
-                            
+
                             <!-- Description -->
                             <p class="text-muted flex-grow-1" style="font-size: var(--text-sm); line-height: var(--leading-relaxed); margin-bottom: var(--space-4);">
                                 {{ Str::limit($post->description, 100) }}
@@ -81,9 +83,9 @@
                             </div>
 
                             <!-- Actions -->
-                            <div class="d-flex gap-2">
+                            <div class="d-flex gap-2 position-relative" style="z-index: 2;">
                                 @can('update', $post)
-                                    <a href="{{ url('posts/' . $post->id . '/edit') }}" 
+                                    <a href="{{ url('posts/' . $post->id . '/edit') }}"
                                        class="btn btn-secondary btn-sm flex-fill">
                                         <i class="bi bi-pencil"></i>
                                         Edit
@@ -94,7 +96,7 @@
                                     <form action="{{ url('posts/' . $post->id) }}" method="post" class="flex-fill">
                                         @method('Delete')
                                         @csrf
-                                        <button type="submit" 
+                                        <button type="submit"
                                                 class="btn btn-secondary btn-sm w-100"
                                                 style="color: var(--danger);"
                                                 onclick="return confirm('Are you sure you want to delete this post?')">
@@ -118,7 +120,7 @@
         <!-- Empty State -->
         <div class="text-center py-5" style="padding: var(--space-10) 0;">
             <div class="mb-4">
-                <div class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle"
                      style="width: 80px; height: 80px; background-color: var(--gray-100);">
                     <i class="bi bi-file-text" style="font-size: 2rem; color: var(--gray-400);"></i>
                 </div>
@@ -141,4 +143,5 @@
             transform: scale(1.05);
         }
     </style>
+
 @endsection
