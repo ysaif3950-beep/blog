@@ -4,69 +4,44 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Tag;
-use Illuminate\Auth\Access\Response;
 
 class TagPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): bool
     {
-        // جميع المستخدمين يمكنهم رؤية قائمة الـ tags
+        // أي يوزر يقدر يفتح صفحة التاجس
         return true;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Tag $tag): bool
     {
-        // جميع المستخدمين يمكنهم رؤية أي tag
+        // الأدمن يشوف أي تاج، واليوزر العادي يشوف بس تاجه
+        return $user->role === 'admin' || $user->id === $tag->user_id;
+    }
+
+    public function create(User $user): bool
+    {
+        // أي يوزر مسجل يقدر يضيف تاج (هيبقى تاجه هو تلقائيًا)
         return true;
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return $user->role=='admin';
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Tag $tag): bool
     {
-        // فقط الـ admin يمكنه تعديل الـ tags
-        return $user->role === 'admin';
+        return $user->role === 'admin' || $user->id === $tag->user_id;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Tag $tag): bool
     {
-        // فقط الـ admin يمكنه حذف الـ tags
-        return $user->role === 'admin';
+        return $user->role === 'admin' || $user->id === $tag->user_id;
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
     public function restore(User $user, Tag $tag): bool
     {
-        // فقط الـ admin يمكنه استرجاع tags محذوفة
         return $user->role === 'admin';
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
     public function forceDelete(User $user, Tag $tag): bool
     {
-        // فقط الـ admin يمكنه الحذف النهائي
         return $user->role === 'admin';
     }
 }
