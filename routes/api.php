@@ -17,7 +17,7 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Middleware\EnsureAccessTokenSessionIsActive;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->as('api.v1.')->group(function () {
 
     Route::prefix('auth')->middleware('throttle:auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);

@@ -1,45 +1,47 @@
 @extends('layout.app')
+
 @section('content')
- <div class="col-12">
-    <h1 class="p-3 border text-center my-3">Edit User info</h1>
-</div>
-            @include('layout.message')
-            @include('layout.error')
-
-
-
-<div class="col-8 mx-auto">
-    <form action="{{ route('users.update',  $user->id) }}" method="post" class="form border p-3">
-        @csrf
-        @method('put')
-        <div class="mb-3">
-            <label for="">User Name</label>
-
-            <input type="text" value="{{ $user->name }}" class="form-control" name="name">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+        <div class="mb-4">
+            <h1 style="font-size: var(--text-3xl); font-weight: 700;">Edit Tag</h1>
+            <p class="text-muted" style="font-size: var(--text-base);">Update the tag name used to organize posts</p>
         </div>
 
-        <div class="mb-3">
-            <label for="">User Email</label>
-            <input type="email" value="{{ $user->email }}" class="form-control" name="email">
-        </div>
+        @include('layout.error')
+        @include('layout.message')
 
-        <div class="mb-3">
-            <label for="">User Password</label>
-            <input type="password" class="form-control" name="password">
-        </div>
-        </div>
+        <div class="card">
+            <div class="card-body" style="padding: var(--space-6);">
+                <form action="{{ route('tags.update', $tag->id) }}" method="post">
+                    @csrf
+                    @method('put')
 
-      <div class="mb-3">
-            <label class="form-label">User Role</label>
-            <select name="role" class="form-control">
-                <option @selected($user->role == 'admin') value="admin">Admin</option>
-                <option @selected($user->role == 'user') value="user">User</option>
-            </select>
-        </div>
+                    <div class="mb-5">
+                        <label class="form-label" for="tag-name">
+                            Tag Name <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="tag-name"
+                               name="name"
+                               value="{{ old('name', $tag->name) }}"
+                               placeholder="Write a clear tag name"
+                               required
+                               autofocus>
+                        <div class="form-text">Use short names that make posts easier to find</div>
+                    </div>
 
-        <div class="mb-3">
-            <input type="submit" class="form-control bg-success text-white" value="Save">
+                    <div class="d-flex gap-3 pt-4 border-top">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-lg"></i>
+                            Save Changes
+                        </button>
+                        <a href="{{ route('tags.index') }}" class="btn btn-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
 @endsection

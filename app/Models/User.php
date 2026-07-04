@@ -4,16 +4,17 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Storage;
-
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory,HasApiTokens, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -48,20 +49,26 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function posts()
+
+    public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
     }
 
-    public function getProfileImageUrlAttribute(): string
+    public function tags(): HasMany
     {
-    if (
-        $this->profile_image &&
-        Storage::disk('public')->exists($this->profile_image)
-    ) {
-        return Storage::url($this->profile_image);
+        return $this->hasMany(Tag::class);
     }
 
-    return Storage::url('profiles/default.png');
-}
+    public function getProfileImageUrlAttribute(): string
+    {
+        if (
+            $this->profile_image &&
+            Storage::disk('public')->exists($this->profile_image)
+        ) {
+            return Storage::url($this->profile_image);
+        }
+
+        return Storage::url('profiles/default.png');
+    }
 }
