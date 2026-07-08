@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -17,18 +18,20 @@ class UserController extends Controller
     }
 
     //
-    public function index()
+    public function index(): View
     {
         $users = User::orderBy('id', 'desc')->paginate(15);
+
         return view('users.index', compact('users'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('users.create');
     }
-    public function store(StoreUserRequest $request)
-        {
+
+    public function store(StoreUserRequest $request): RedirectResponse
+    {
         $data = $request->validated();
 
         $data['password'] = bcrypt($data['password']);
@@ -46,45 +49,82 @@ class UserController extends Controller
             ->with('success', 'User created successfully.');
     }
 
-   public function edit(User $user)
-{
-    return view('users.edit', compact('user'));
-}
-
-    public function update(UpdateUserRequest $request, User $user)
-{
-     $data = $request->validated();
-       if($request->filled('password')){
-        $data['password']=bcrypt($data['password']);
+    public function edit(User $user): View
+    {
+        return view('users.edit', compact('user'));
     }
-        else{
-             unset($data['password']);
+
+    public function update(UpdateUserRequest $request, User $user): RedirectResponse
+    {
+        $data = $request->validated();
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($data['password']);
+        } else {
+            unset($data['password']);
         }
 
+        $user->update($data);
 
+        return redirect()->route('users.index')->with('success', 'User updated successfully!');
+    }
 
-    $user->update($data);
+    public function destroy(User $user): RedirectResponse
+    {
+        $user->delete();
 
-    return redirect()->route('users.index')->with('success', 'User updated successfully!');
-}
+        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+    }
 
-
-
-   public function destroy(User $user)
-{
-    $user->delete();
-    return redirect()->route('users.index')->with('success', 'User deleted successfully.');
-}
-
-    public function posts(string $id)
+    public function posts(string $id): View
     {
         $user = User::findOrFail($id);
+
         return view('users.posts', compact('user'));
     }
-    public function profile()
+
+    public function profile(): View
     {
-        $user = auth()->user();
-        return view('users.profile', compact('user'));
+        $user = User::findOrFail(auth()->id());
+        $posts = $user->posts()
+            ->with('tags')
+            ->latest()
+            ->paginate(6, ['*'], 'posts_page');
+        $tags = $user->tags()
+            ->withCount('posts')
+            ->latest()
+            ->paginate(12, ['*'], 'tags_page');
+
+        return view('users.profile', compact('user', 'posts', 'tags'));
     }
 
+    public function editProfile(): View
+    {
+        $user = User::findOrFail(auth()->id());
+
+        return view('users.edit-profile', compact('user'));
+    }
+
+    public function updateProfile(UpdateProfileRequest $request): RedirectResponse
+    {
+        $user = User::findOrFail(auth()->id());
+        $data = $request->validated();
+
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        if ($request->hasFile('profile_image')) {
+            if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+                Storage::disk('public')->delete($user->profile_image);
+            }
+
+            $data['profile_image'] = $request->file('profile_image')->store('profiles', 'public');
+        }
+
+        $user->update($data);
+
+        return redirect()->route('users.profile')->with('success', 'Profile updated successfully.');
+    }
 }

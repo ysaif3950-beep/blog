@@ -350,9 +350,14 @@
                             <i class="bi bi-file-text me-1"></i> Posts
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('users/profile*') ? 'active' : '' }}" href="{{ route('users.profile') }}">
+                            <i class="bi bi-person-circle me-1"></i> Profile
+                        </a>
+                    </li>
                     @can('viewAny', \App\Models\User::class)
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('users*') ? 'active' : '' }}" href="{{ url('users')}}">
+                        <a class="nav-link {{ request()->routeIs('users.index', 'users.create', 'users.edit', 'users.show', 'users.posts') ? 'active' : '' }}" href="{{ url('users')}}">
                             <i class="bi bi-people me-1"></i> Users
                         </a>
                     </li>
@@ -393,6 +398,12 @@
                             <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('users.profile') }}">
+                                    <i class="bi bi-person-circle text-primary"></i>
+                                    Profile
+                                </a>
+                            </li>
                             <li>
                                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="bi bi-box-arrow-right text-danger"></i>
