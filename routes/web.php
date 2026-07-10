@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('users/profile/edit', [UserController::class, 'editProfile'])->name('users.profile.edit');
     Route::put('users/profile', [UserController::class, 'updateProfile'])->name('users.profile.update');
     Route::get('users/profile', [UserController::class, 'profile'])->name('users.profile');
-    Route::resource('users', UserController::class)->middleware('can:admin-control');
+    Route::resource('users', UserController::class);
     Route::get('users/{id}/posts', [UserController::class, 'posts'])->name('users.posts');
     Route::resource('tags', TagController::class);
 });

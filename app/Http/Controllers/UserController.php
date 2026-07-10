@@ -51,16 +51,35 @@ class UserController extends Controller
 
     public function edit(User $user): View
     {
-        return view('users.edit', compact('user'));
+        return view('users.edit-profile', [
+            'user' => $user,
+            'formAction' => route('users.update', $user),
+            'cancelUrl' => route('users.index'),
+            'pageTitle' => 'Edit Profile',
+            'pageDescription' => 'Update profile details, photo, and access level',
+            'submitLabel' => 'Save Changes',
+            'showRoleField' => true,
+        ]);
     }
 
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
         $data = $request->validated();
+
         if ($request->filled('password')) {
             $data['password'] = bcrypt($data['password']);
         } else {
             unset($data['password']);
+        }
+
+        unset($data['profile_image']);
+
+        if ($request->hasFile('profile_image')) {
+            if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+                Storage::disk('public')->delete($user->profile_image);
+            }
+
+            $data['profile_image'] = $request->file('profile_image')->store('profiles', 'public');
         }
 
         $user->update($data);
@@ -101,7 +120,15 @@ class UserController extends Controller
     {
         $user = User::findOrFail(auth()->id());
 
-        return view('users.edit-profile', compact('user'));
+        return view('users.edit-profile', [
+            'user' => $user,
+            'formAction' => route('users.profile.update'),
+            'cancelUrl' => route('users.profile'),
+            'pageTitle' => 'Edit Profile',
+            'pageDescription' => 'Update your profile details and photo',
+            'submitLabel' => 'Save Profile',
+            'showRoleField' => false,
+        ]);
     }
 
     public function updateProfile(UpdateProfileRequest $request): RedirectResponse
@@ -114,6 +141,8 @@ class UserController extends Controller
         } else {
             unset($data['password']);
         }
+
+        unset($data['profile_image']);
 
         if ($request->hasFile('profile_image')) {
             if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -12,7 +14,6 @@ class UpdateUserRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
-
     }
 
     /**
@@ -22,20 +23,15 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        if ($this->route('user') instanceof \App\Models\User) {
-    // لو اللي راجع من الراوت كائن User
-    $userId = $this->route('user')->id;
-} else {
-    // لو اللي راجع رقم id بس
-    $userId = $this->route('user');
-}
+        $routeUser = $this->route('user');
+        $userId = $routeUser instanceof User ? $routeUser->id : $routeUser;
 
         return [
-            //
-              'name'     => 'required|string|max:100|min:3',
-            'email'    => 'required|email|unique:users,email,' . $userId,
+            'name' => 'required|string|max:100|min:3',
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($userId)],
             'password' => 'nullable|string|min:8|confirmed',
-            'role'     => 'required|in:admin,user',
+            'role' => 'required|in:admin,user',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ];
-        }
     }
+}

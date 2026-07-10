@@ -1,11 +1,20 @@
 @extends('layout.app')
 
 @section('content')
+@php
+    $formAction ??= route('users.profile.update');
+    $cancelUrl ??= route('users.profile');
+    $pageTitle ??= 'Edit Profile';
+    $pageDescription ??= 'Update your profile details and photo';
+    $submitLabel ??= 'Save Profile';
+    $showRoleField ??= false;
+@endphp
+
 <div class="row justify-content-center">
     <div class="col-12 col-md-10 col-lg-8">
         <div class="mb-4">
-            <h1 style="font-size: var(--text-3xl); font-weight: 700;">Edit Profile</h1>
-            <p class="text-muted" style="font-size: var(--text-base);">Update your account details and profile photo</p>
+            <h1 style="font-size: var(--text-3xl); font-weight: 700;">{{ $pageTitle }}</h1>
+            <p class="text-muted" style="font-size: var(--text-base);">{{ $pageDescription }}</p>
         </div>
 
         @include('layout.message')
@@ -13,7 +22,7 @@
 
         <div class="card">
             <div class="card-body" style="padding: var(--space-6);">
-                <form action="{{ route('users.profile.update') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ $formAction }}" method="post" enctype="multipart/form-data">
                     @csrf
                     @method('put')
 
@@ -71,7 +80,7 @@
                         <div class="form-text">Leave it blank to keep the current password</div>
                     </div>
 
-                    <div class="mb-5">
+                    <div class="{{ $showRoleField ? 'mb-4' : 'mb-5' }}">
                         <label class="form-label" for="user-password-confirmation">Confirm Password</label>
                         <input type="password"
                                class="form-control"
@@ -80,12 +89,25 @@
                                placeholder="Repeat the new password">
                     </div>
 
+                    @if ($showRoleField)
+                        <div class="mb-5">
+                            <label class="form-label" for="user-role">
+                                Role <span class="text-danger">*</span>
+                            </label>
+                            <select name="role" id="user-role" class="form-select" required>
+                                <option value="admin" @selected(old('role', $user->role) === 'admin')>Admin</option>
+                                <option value="user" @selected(old('role', $user->role) === 'user')>User</option>
+                            </select>
+                            <div class="form-text">Choose the access level for this account</div>
+                        </div>
+                    @endif
+
                     <div class="d-flex gap-3 pt-4 border-top">
                         <button type="submit" class="btn btn-primary btn-lg">
                             <i class="bi bi-check-lg"></i>
-                            Save Profile
+                            {{ $submitLabel }}
                         </button>
-                        <a href="{{ route('users.profile') }}" class="btn btn-secondary btn-lg">Cancel</a>
+                        <a href="{{ $cancelUrl }}" class="btn btn-secondary btn-lg">Cancel</a>
                     </div>
                 </form>
             </div>

@@ -61,6 +61,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Tag::class);
     }
+    public function isAdmin(): bool
+{
+    return $this->role === 'admin';
+}
 
     public function getProfileImageUrlAttribute(): string
     {

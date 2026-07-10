@@ -13,7 +13,6 @@ class PostPolicy
      */
     public function viewAny(User $user): bool
     {
-        // جميع المستخدمين يمكنهم رؤية قائمة المقالات
         return true;
     }
 
@@ -22,7 +21,6 @@ class PostPolicy
      */
     public function view(User $user, Post $post): bool
     {
-        // جميع المستخدمين يمكنهم رؤية أي مقال
         return true;
     }
 
@@ -31,7 +29,6 @@ class PostPolicy
      */
     public function create(User $user): bool
     {
-        // أي مستخدم مسجل يمكنه إنشاء مقال
         return true;
     }
 
@@ -40,8 +37,7 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        // صاحب المقال أو الـ admin يمكنهم التعديل
-        return $user->id === $post->user_id || $user->role === 'admin';
+        return $user->id === $post->user_id ;
     }
 
     /**
@@ -49,25 +45,9 @@ class PostPolicy
      */
     public function delete(User $user, Post $post): bool
     {
-        // صاحب المقال أو الـ admin يمكنهم الحذف
-        return $user->id === $post->user_id || $user->role === 'admin';
+        return $user->id === $post->user_id || $user->isAdmin();
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Post $post): bool
-    {
-        // فقط الـ admin يمكنه استرجاع المقالات المحذوفة
-        return $user->role === 'admin';
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Post $post): bool
-    {
-        // فقط الـ admin يمكنه الحذف النهائي
-        return $user->role === 'admin';
-    }
+    
+   
 }

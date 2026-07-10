@@ -9,7 +9,6 @@ class TagPolicy
 {
     public function viewAny(User $user): bool
     {
-        // أي يوزر يقدر يفتح صفحة التاجس
         return true;
     }
 
@@ -21,27 +20,18 @@ class TagPolicy
 
     public function create(User $user): bool
     {
-        // أي يوزر مسجل يقدر يضيف تاج (هيبقى تاجه هو تلقائيًا)
         return true;
     }
 
     public function update(User $user, Tag $tag): bool
     {
-        return $user->role === 'admin' || $user->id === $tag->user_id;
+        return $user->id === $tag->user_id;
     }
 
     public function delete(User $user, Tag $tag): bool
     {
-        return $user->role === 'admin' || $user->id === $tag->user_id;
+        return $user->isAdmin() || $user->id === $tag->user_id;
     }
 
-    public function restore(User $user, Tag $tag): bool
-    {
-        return $user->role === 'admin';
-    }
-
-    public function forceDelete(User $user, Tag $tag): bool
-    {
-        return $user->role === 'admin';
-    }
+    
 }

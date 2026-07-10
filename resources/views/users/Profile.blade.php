@@ -1,11 +1,11 @@
 @extends('layout.app')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-start gap-3 mb-5 pb-4 border-bottom">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-5 pb-4 border-bottom">
         <div>
             <h1 class="mb-2" style="font-size: var(--text-4xl); font-weight: 800;">My Profile</h1>
             <p class="text-muted mb-0" style="font-size: var(--text-base);">
-                Your account details, posts, and tags in one place
+                Your posts, tags, and profile activity in one place
             </p>
         </div>
 
@@ -17,86 +17,68 @@
 
     @include('layout.message')
 
-    <div class="row g-4 mb-5">
-        <div class="col-12 col-lg-4">
-            <div class="card h-100">
-                <div class="card-body text-center" style="padding: var(--space-6);">
-                    <img src="{{ $user->profile_image_url }}"
-                         alt="{{ $user->name }}"
-                         class="rounded-circle object-fit-cover mb-4"
-                         style="width: 128px; height: 128px; border: 4px solid var(--primary-50);">
+    <div class="card mb-5 overflow-hidden">
+        <div class="card-body" style="padding: var(--space-6);">
+            <div class="row g-4 align-items-center">
+                <div class="col-12 col-lg-5">
+                    <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-4 text-center text-sm-start">
+                        <img src="{{ $user->profile_image_url }}"
+                             alt="{{ $user->name }}"
+                             class="rounded-circle object-fit-cover flex-shrink-0"
+                             style="width: 136px; height: 136px; border: 5px solid var(--primary-50); box-shadow: var(--shadow-md);">
 
-                    <h2 class="mb-2" style="font-size: var(--text-2xl); font-weight: 700;">{{ $user->name }}</h2>
-                    <p class="text-muted mb-3">{{ $user->email }}</p>
-
-                    <span class="badge bg-{{ $user->role === 'admin' ? 'primary' : 'secondary' }}">
-                        {{ ucfirst($user->role) }}
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-lg-8">
-            <div class="row g-4 h-100">
-                <div class="col-12 col-md-4">
-                    <div class="card h-100">
-                        <div class="card-body" style="padding: var(--space-5);">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="user-avatar">
-                                    <i class="bi bi-file-text"></i>
-                                </div>
-                                <div>
-                                    <div class="text-muted" style="font-size: var(--text-sm);">Posts</div>
-                                    <div style="font-size: var(--text-3xl); font-weight: 800;">{{ $posts->total() }}</div>
-                                </div>
-                            </div>
+                        <div class="pt-sm-3">
+                            <span class="badge bg-{{ $user->role === 'admin' ? 'primary' : 'secondary' }} mb-3">
+                                {{ ucfirst($user->role) }}
+                            </span>
+                            <h2 class="mb-2" style="font-size: var(--text-3xl); font-weight: 800;">{{ $user->name }}</h2>
+                            <p class="text-muted mb-0" style="font-size: var(--text-sm);">
+                                Member since {{ $user->created_at->format('M Y') }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-12 col-md-4">
-                    <div class="card h-100">
-                        <div class="card-body" style="padding: var(--space-5);">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="user-avatar">
-                                    <i class="bi bi-tags"></i>
-                                </div>
-                                <div>
-                                    <div class="text-muted" style="font-size: var(--text-sm);">Tags</div>
-                                    <div style="font-size: var(--text-3xl); font-weight: 800;">{{ $tags->total() }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-md-4">
-                    <div class="card h-100">
-                        <div class="card-body" style="padding: var(--space-5);">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="user-avatar">
-                                    <i class="bi bi-calendar3"></i>
-                                </div>
-                                <div>
-                                    <div class="text-muted" style="font-size: var(--text-sm);">Joined</div>
-                                    <div style="font-size: var(--text-lg); font-weight: 700;">{{ $user->created_at->format('M Y') }}</div>
+                <div class="col-12 col-lg-7">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded-3 h-100" style="padding: var(--space-4); background-color: var(--gray-50);">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="user-avatar">
+                                        <i class="bi bi-file-text"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted" style="font-size: var(--text-sm);">Posts</div>
+                                        <div style="font-size: var(--text-3xl); font-weight: 800;">{{ $posts->total() }}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="col-12">
-                    <div class="card h-100">
-                        <div class="card-body" style="padding: var(--space-5);">
-                            <div class="row g-4">
-                                <div class="col-12 col-md-6">
-                                    <div class="text-muted mb-1" style="font-size: var(--text-sm);">Account ID</div>
-                                    <div style="font-weight: 600;">#{{ $user->id }}</div>
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded-3 h-100" style="padding: var(--space-4); background-color: var(--gray-50);">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="user-avatar">
+                                        <i class="bi bi-tags"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted" style="font-size: var(--text-sm);">Tags</div>
+                                        <div style="font-size: var(--text-3xl); font-weight: 800;">{{ $tags->total() }}</div>
+                                    </div>
                                 </div>
-                                <div class="col-12 col-md-6">
-                                    <div class="text-muted mb-1" style="font-size: var(--text-sm);">Last Updated</div>
-                                    <div style="font-weight: 600;">{{ $user->updated_at->format('M d, Y') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded-3 h-100" style="padding: var(--space-4); background-color: var(--gray-50);">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="user-avatar">
+                                        <i class="bi bi-clock-history"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted" style="font-size: var(--text-sm);">Updated</div>
+                                        <div style="font-size: var(--text-lg); font-weight: 700;">{{ $user->updated_at->format('M d') }}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
