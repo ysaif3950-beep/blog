@@ -17,16 +17,13 @@ class TagController extends Controller
     {
         $this->authorizeResource(Tag::class, 'tag');
     }
-
-    public function index(): View
-    {
-        $tags = auth()->user()->role === 'admin'
-            ? Tag::with('user')->latest()->paginate(15)
-            : auth()->user()->tags()->latest()->paginate(15);
-
-        return view('tags.index', compact('tags'));
-    }
-
+public function index(): View
+{
+   $tags = auth()->user()->role === 'admin'
+    ? Tag::with(['user', 'posts'])->latest()->paginate(15)
+    : auth()->user()->tags()->with(['user', 'posts'])->latest()->paginate(15);
+    return view('tags.index', compact('tags'));
+}
     /**
      * Show the form for creating a new resource.
      */

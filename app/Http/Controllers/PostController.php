@@ -22,40 +22,42 @@ class PostController extends Controller
        $this->authorizeResource(Post::class, 'post');
     }
 
-     public function show(Post $post)
-    {
-        return view('posts.show',['post'=>$post]);
-    }
+    public function show(Post $post)
+{
+    $post->load(['user', 'tags']);
+
+    return view('posts.show', ['post' => $post]);
+}
 
 
 
     public function search(Request $request)
     {
-       $posts= Post::where
+       $posts= Post::with('user')->where
          ('description','like','%'.$request->search.'%')->
-         orwhere('title','like','%'.$request->search.'%')->paginate(15);
+         orwhere('title','like','%'.$request->search.'%')->latest()->paginate(15);
         return view('posts.search',['posts'=>$posts]);
     }
 
 
+ public function index()
+{
+    $posts = Post::with(['user', 'tags'])
+        ->orderBy('id', 'desc')
+        ->paginate(15);
+
+    return view('posts.index', ['posts' => $posts]);
+}
 
 
+    public function home()
+   {
+    $posts = Post::with('user')
+        ->orderBy('id', 'desc')
+        ->paginate(15);
 
-    public function index()
-    {
-         $posts = Post::orderby('id','desc')->paginate(15);
-        return view('posts.index',['posts'=>$posts]);
-    }
-
-
-
-     public function home()
-    {
-        $posts= Post::orderby('id','desc')->paginate(15);
-        return view('home',['posts'=>$posts]);
-    }
-
-
+    return view('home', ['posts' => $posts]);
+     }
 
     public function create()
     {
@@ -65,12 +67,11 @@ class PostController extends Controller
 
 
     public function edit(Post $post)
-    {
-        $tags=Tag::select('id','name')->get();
-        $users=User::select('id','name')->get();
-        return view('posts.edit',['post'=>$post,'tags'=>$tags,'users'=>$users ]);
-
-    }
+{
+     $post->load('tags');
+    $tags = Tag::select('id','name')->get();
+    return view('posts.edit', ['post' => $post, 'tags' => $tags]);
+}
 
 
 
@@ -78,7 +79,7 @@ class PostController extends Controller
     {
 
         $data = $request->validated();
-        
+
         $old_image=$post->image;
 
 

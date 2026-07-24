@@ -1,6 +1,7 @@
 @extends('layout.app')
 
 @section('content')
+
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-5 pb-4 border-bottom">
         <div>
@@ -18,7 +19,6 @@
     </div>
 
     @include('layout.message')
-
     @if($posts->count() > 0)
         <!-- Posts Grid -->
         <div class="row g-4 mb-5">

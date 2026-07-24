@@ -5,20 +5,28 @@
 
         <a href="{{ url('tags/create') }}" class="btn btn-primary my-3">Add New Tag</a>
         @endcan
-
         <h1 class="p-3 border text-center my-3">All tags</h1>
     </div>
 
     <div class="col-12">
         @include('layout.message')
+        @php
+            $canUpdateTags = $tags->getCollection()->contains(fn ($tag) => auth()->user()->can('update', $tag));
+            $canDeleteTags = $tags->getCollection()->contains(fn ($tag) => auth()->user()->can('delete', $tag));
+        @endphp
+
         <table class="table table-bordered table-striped text-center align-middle">
             <thead class="table-dark">
                 <tr>
                     <th>#</th>
                     <th>Tag Name</th>
                     <th>Posts</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
+                    @if ($canUpdateTags)
+                        <th>Edit</th>
+                    @endif
+                    @if ($canDeleteTags)
+                        <th>Delete</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -37,22 +45,28 @@
                 @endforelse
                           </td>
 
-                        <td>
-                            @can('update' ,$tag)
+                        @if ($canUpdateTags)
+                            <td>
+                                @can('update' ,$tag)
 
-                            <a href="{{ url('tags/' . $tag->id . '/edit') }}" class="btn btn-info btn-sm">Edit</a>
-                            @endcan
+                                <a href="{{ url('tags/' . $tag->id . '/edit') }}" class="btn btn-info btn-sm">Edit</a>
+                                @endcan
 
-                        </td>
-                        <td>
-                            <form action="{{ url('tags/' . $tag->id) }}" method="post" class="d-inline">
-                                @method('DELETE')
-                                @csrf
-                                
-                                <input type="submit" value="Delete" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Are you sure you want to delete this tag?')">
-                            </form>
-                        </td>
+                            </td>
+                        @endif
+                        @if ($canDeleteTags)
+                            <td>
+                                @can('delete', $tag)
+                                    <form action="{{ url('tags/' . $tag->id) }}" method="post" class="d-inline">
+                                        @method('DELETE')
+                                        @csrf
+
+                                        <input type="submit" value="Delete" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Are you sure you want to delete this tag?')">
+                                    </form>
+                                @endcan
+                            </td>
+                        @endif
                     </tr>
                 @endforeach
             </tbody>

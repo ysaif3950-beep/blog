@@ -22,6 +22,7 @@ class PostFactory extends Factory
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph(6),
             'user_id' => User::inRandomOrder()->first()?->id ?? User::factory(),
+            'image' => null,
         ];
     }
 }

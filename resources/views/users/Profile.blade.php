@@ -9,10 +9,12 @@
             </p>
         </div>
 
-        <a href="{{ route('users.profile.edit') }}" class="btn btn-secondary">
-            <i class="bi bi-pencil"></i>
-            Edit Profile
-        </a>
+        @can('update', $user)
+            <a href="{{ route('users.profile.edit') }}" class="btn btn-secondary">
+                <i class="bi bi-pencil"></i>
+                Edit Profile
+            </a>
+        @endcan
     </div>
 
     @include('layout.message')
@@ -95,10 +97,12 @@
                 <p class="text-muted mb-0" style="font-size: var(--text-sm);">Posts written by you</p>
             </div>
 
-            <a href="{{ route('posts.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i>
-                New Post
-            </a>
+            @can('create', \App\Models\Post::class)
+                <a href="{{ route('posts.create') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i>
+                    New Post
+                </a>
+            @endcan
         </div>
 
         @if ($posts->count() > 0)
@@ -151,10 +155,12 @@
                     <i class="bi bi-file-text mb-3" style="font-size: 3rem; color: var(--gray-400);"></i>
                     <h3 class="mb-2">No posts yet</h3>
                     <p class="text-muted mb-4">Start writing your first post.</p>
-                    <a href="{{ route('posts.create') }}" class="btn btn-primary">
-                        <i class="bi bi-plus-lg"></i>
-                        Create Post
-                    </a>
+                    @can('create', \App\Models\Post::class)
+                        <a href="{{ route('posts.create') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i>
+                            Create Post
+                        </a>
+                    @endcan
                 </div>
             </div>
         @endif
@@ -167,10 +173,12 @@
                 <p class="text-muted mb-0" style="font-size: var(--text-sm);">Tags created by you</p>
             </div>
 
-            <a href="{{ route('tags.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i>
-                New Tag
-            </a>
+            @can('create', \App\Models\Tag::class)
+                <a href="{{ route('tags.create') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i>
+                    New Tag
+                </a>
+            @endcan
         </div>
 
         @if ($tags->count() > 0)
@@ -187,10 +195,12 @@
                                         </p>
                                     </div>
 
-                                    <a href="{{ route('tags.edit', $tag->id) }}" class="btn btn-secondary btn-sm">
-                                        <i class="bi bi-pencil"></i>
-                                        Edit
-                                    </a>
+                                    @can('update', $tag)
+                                        <a href="{{ route('tags.edit', $tag->id) }}" class="btn btn-secondary btn-sm">
+                                            <i class="bi bi-pencil"></i>
+                                            Edit
+                                        </a>
+                                    @endcan
                                 </div>
                             </div>
                         </div>
@@ -207,12 +217,56 @@
                     <i class="bi bi-tags mb-3" style="font-size: 3rem; color: var(--gray-400);"></i>
                     <h3 class="mb-2">No tags yet</h3>
                     <p class="text-muted mb-4">Create tags to organize your posts.</p>
-                    <a href="{{ route('tags.create') }}" class="btn btn-primary">
-                        <i class="bi bi-plus-lg"></i>
-                        Create Tag
-                    </a>
+                    @can('create', \App\Models\Tag::class)
+                        <a href="{{ route('tags.create') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i>
+                            Create Tag
+                        </a>
+                    @endcan
                 </div>
             </div>
         @endif
     </section>
+
+    @can('delete', $user)
+        <section class="mt-5">
+            <div class="border border-danger rounded-3" style="padding: var(--space-5);">
+                <div class="mb-4">
+                    <h2 class="text-danger mb-1" style="font-size: var(--text-2xl); font-weight: 700;">Danger Zone</h2>
+                    <p class="text-muted mb-0" style="font-size: var(--text-sm);">Deleting your account is permanent and cannot be undone. There is no recovery.</p>
+                </div>
+
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    Delete My Account
+                </button>
+            </div>
+        </section>
+
+        <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-3">
+                    <div class="modal-header">
+                        <h2 class="modal-title text-danger" id="deleteAccountModalLabel" style="font-size: var(--text-xl); font-weight: 700;">Delete Account?</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body" style="padding: var(--space-5);">
+                        <p class="text-muted mb-0" style="font-size: var(--text-sm); line-height: var(--leading-relaxed);">
+                            Are you sure you want to delete your account? This action is permanent and cannot be undone.
+                        </p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                        <form action="{{ route('users.profile.destroy') }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">Delete My Account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endcan
 @endsection

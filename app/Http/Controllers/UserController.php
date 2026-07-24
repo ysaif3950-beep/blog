@@ -20,7 +20,9 @@ class UserController extends Controller
     //
     public function index(): View
     {
-        $users = User::orderBy('id', 'desc')->paginate(15);
+   $users = User::select('id', 'name', 'email', 'role')
+    ->orderByDesc('id')
+    ->paginate(15);
 
         return view('users.index', compact('users'));
     }
@@ -62,9 +64,15 @@ class UserController extends Controller
         ]);
     }
 
+
+
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
         $data = $request->validated();
+
+        if (! auth()->user()->isAdmin()) {
+            unset($data['role']);
+        }
 
         if ($request->filled('password')) {
             $data['password'] = bcrypt($data['password']);
@@ -94,16 +102,33 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 
-    public function posts(string $id): View
+    public function destroySelf(): RedirectResponse
     {
-        $user = User::findOrFail($id);
+        $user = auth()->user();
 
-        return view('users.posts', compact('user'));
+        auth()->logout();
+
+        $user->delete();
+
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect()->route('home')->with('success', 'Your account has been deleted successfully');
+    }
+
+    public function posts(User $user): View
+    {
+     $posts = $user->posts()
+    ->select('id', 'title', 'description', 'user_id', 'created_at')
+    ->with('user:id,name')
+    ->latest()
+    ->paginate(10);
+        return view('users.posts', compact('user','posts'));
     }
 
     public function profile(): View
     {
-        $user = User::findOrFail(auth()->id());
+        $user = auth()->user();
         $posts = $user->posts()
             ->with('tags')
             ->latest()
@@ -118,7 +143,7 @@ class UserController extends Controller
 
     public function editProfile(): View
     {
-        $user = User::findOrFail(auth()->id());
+         $user = auth()->user();
 
         return view('users.edit-profile', [
             'user' => $user,

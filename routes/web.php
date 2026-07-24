@@ -29,8 +29,9 @@ Route::middleware('auth')->group(function () {
     Route::get('users/profile/edit', [UserController::class, 'editProfile'])->name('users.profile.edit');
     Route::put('users/profile', [UserController::class, 'updateProfile'])->name('users.profile.update');
     Route::get('users/profile', [UserController::class, 'profile'])->name('users.profile');
+    Route::delete('users/profile', [UserController::class, 'destroySelf'])->name('users.profile.destroy');
     Route::resource('users', UserController::class);
-    Route::get('users/{id}/posts', [UserController::class, 'posts'])->name('users.posts');
+    Route::get('users/{user}/posts', [UserController::class, 'posts'])->name('users.posts');
     Route::resource('tags', TagController::class);
 });
 

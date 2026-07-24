@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Tag;
+use App\Models\User;
 
 class TagPolicy
 {
@@ -14,8 +14,7 @@ class TagPolicy
 
     public function view(User $user, Tag $tag): bool
     {
-        // الأدمن يشوف أي تاج، واليوزر العادي يشوف بس تاجه
-        return $user->role === 'admin' || $user->id === $tag->user_id;
+        return true;
     }
 
     public function create(User $user): bool
@@ -25,13 +24,11 @@ class TagPolicy
 
     public function update(User $user, Tag $tag): bool
     {
-        return $user->id === $tag->user_id;
+        return $user->isAdmin();
     }
 
     public function delete(User $user, Tag $tag): bool
     {
-        return $user->isAdmin() || $user->id === $tag->user_id;
+        return $user->isAdmin();
     }
-
-    
 }
