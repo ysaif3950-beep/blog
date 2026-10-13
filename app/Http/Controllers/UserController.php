@@ -19,10 +19,12 @@ class UserController extends Controller
 
     //
     public function index(): View
-    {
-   $users = User::select('id', 'name', 'email', 'role')
-    ->orderByDesc('id')
-    ->paginate(15);
+     {
+
+        $users = User::select('id', 'name', 'email', 'role')
+                    ->orderByDesc('id')
+                    ->paginate(15);
+
 
         return view('users.index', compact('users'));
     }
@@ -45,7 +47,6 @@ class UserController extends Controller
         }
 
         User::create($data);
-
         return redirect()
             ->route('users.index')
             ->with('success', 'User created successfully.');
